@@ -1,43 +1,53 @@
 package com.dio.controledepontoeacesso.service;
 
-import com.dio.controledepontoeacesso.exception.NoSuchElementException;
-import com.dio.controledepontoeacesso.model.Empresa;
+import com.dio.controledepontoeacesso.dto.EmpresaDTO;
+import com.dio.controledepontoeacesso.exception.NotFoundException;
+import com.dio.controledepontoeacesso.mapper.EmpresaMapper;
 import com.dio.controledepontoeacesso.repository.EmpresaRepository;
+import com.dio.controledepontoeacesso.response.EmpresaResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class EmpresaService {
+    @Autowired
     EmpresaRepository empresaRepository;
 
     @Autowired
-    public EmpresaService(EmpresaRepository empresaRepository) {
-        this.empresaRepository = empresaRepository;
+    EmpresaMapper empresaMapper;
+
+    public EmpresaDTO saveEmpresa(EmpresaDTO empresa){
+        return empresaMapper.toEmpresaDTO(
+                empresaRepository.save(
+                        empresaMapper.toEmpresa(empresa)
+                )
+        );
     }
 
-    public Empresa saveEmpresa(Empresa empresa){
-        return empresaRepository.save(empresa);
+    public List<EmpresaDTO> findAll() {
+        return empresaMapper.toEmpresaDTOs(empresaRepository.findAll());
     }
 
-    public List<Empresa> findAll() {
-        return empresaRepository.findAll();
+    public EmpresaDTO getById(Long idEmpresa) throws NotFoundException {
+        return empresaRepository.findById(idEmpresa)
+                .map(empresaMapper::toEmpresaDTO)
+                .orElseThrow(() -> new NotFoundException(EmpresaResponse.ENTITY_NOT_FOUND));
     }
 
-    public Optional<Empresa> getById(Long idEmpresa) {
-        return empresaRepository.findById(idEmpresa);
-    }
-
-    public Empresa updateEmpresa(Empresa empresa) throws NoSuchElementException {
-        var empresaToBeUpdated = this.getById(empresa.getId());
+    public EmpresaDTO updateEmpresa(EmpresaDTO empresa) throws NotFoundException {
+        var empresaToBeUpdated = empresaRepository.findById(empresa.getId());
 
         if(empresaToBeUpdated.isEmpty()) {
-            throw new NoSuchElementException();
+            throw new NotFoundException(EmpresaResponse.ENTITY_NOT_FOUND);
         }
 
-        return empresaRepository.save(empresa);
+        return empresaMapper.toEmpresaDTO(
+                empresaRepository.save(
+                        empresaMapper.toEmpresa(empresa)
+                )
+        );
     }
 
     public void deleteEmpresa(Long idEmpresa) {

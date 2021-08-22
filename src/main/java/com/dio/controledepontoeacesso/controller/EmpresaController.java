@@ -1,12 +1,18 @@
 package com.dio.controledepontoeacesso.controller;
 
+import com.dio.controledepontoeacesso.dto.EmpresaDTO;
 import com.dio.controledepontoeacesso.exception.NoSuchElementException;
+import com.dio.controledepontoeacesso.exception.NotFoundException;
 import com.dio.controledepontoeacesso.model.Empresa;
+import com.dio.controledepontoeacesso.response.EmpresaResponse;
+import com.dio.controledepontoeacesso.response.TipoDataResponse;
 import com.dio.controledepontoeacesso.service.EmpresaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -19,49 +25,48 @@ public class EmpresaController {
     EmpresaService empresaService;
 
     @PostMapping
-    public Empresa createEmpresa(@Valid @RequestBody Empresa empresa){
-        return empresaService.saveEmpresa(empresa);
+    public ResponseEntity<EmpresaDTO> createEmpresa(@Valid @RequestBody EmpresaDTO empresa){
+        return ResponseEntity.status(HttpStatus.CREATED).body(empresaService.saveEmpresa(empresa));
     }
 
     @GetMapping
-    public List<Empresa> getEmpresaList(){
-        return empresaService.findAll();
+    public ResponseEntity<List<EmpresaDTO>> getEmpresaList(){
+        return ResponseEntity.ok(empresaService.findAll());
     }
 
     @GetMapping("/{idEmpresa}")
-    public ResponseEntity<Empresa> getEmpresaByID(@PathVariable("idEmpresa") Long idEmpresa) {
-        return empresaService.getById(idEmpresa)
-                .map(company -> ResponseEntity.ok().body(company))
-                .orElseGet(() -> ResponseEntity.notFound().build());
+    public ResponseEntity<EmpresaDTO> getEmpresaByID(@PathVariable("idEmpresa") Long idEmpresa) {
+        try {
+            return ResponseEntity.ok(empresaService.getById(idEmpresa));
+        } catch (NotFoundException e) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, EmpresaResponse.ENTITY_NOT_FOUND, e);
+        }
     }
 
-    @PutMapping
-    public ResponseEntity<Empresa> updateEmpresa(@Valid @RequestBody Empresa empresa){
-        var res = Optional.of(empresa.getId());
-
-        if(res.isEmpty() || res.get() <= 0) return ResponseEntity.badRequest().build();
-
+    @PutMapping("/{idEmpresa}")
+    public ResponseEntity<EmpresaDTO> updateEmpresa(@PathVariable("idEmpresa") Long idEmpresa,
+                                                 @Valid @RequestBody EmpresaDTO empresa){
         try {
-            return ResponseEntity.ok().body(empresaService.updateEmpresa(empresa));
-        } catch (NoSuchElementException e) {
-            e.printStackTrace();
-            return ResponseEntity.notFound().build();
+            empresa.setId(idEmpresa);
+            return ResponseEntity.ok(empresaService.updateEmpresa(empresa));
+        } catch (NotFoundException e) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, EmpresaResponse.ENTITY_NOT_FOUND, e);
         }
     }
 
     @DeleteMapping("/{idEmpresa}")
     public ResponseEntity deleteByID(@PathVariable("idEmpresa") Long idEmpresa) {
-        if(idEmpresa <= 0) return ResponseEntity.badRequest().build();
-
         try {
             empresaService.deleteEmpresa(idEmpresa);
             return ResponseEntity.noContent().build();
         } catch (EmptyResultDataAccessException e){
-            e.printStackTrace();
-            return ResponseEntity.notFound().build();
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, EmpresaResponse.ENTITY_NOT_FOUND, e);
         } catch (Exception e){
-            e.printStackTrace();
-            return ResponseEntity.internalServerError().build();
+            throw new ResponseStatusException(
+                    HttpStatus.INTERNAL_SERVER_ERROR, EmpresaResponse.INTERNAL_SERVER_ERROR, e);
         }
     }
 }
