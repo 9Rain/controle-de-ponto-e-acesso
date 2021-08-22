@@ -45,7 +45,7 @@ public class NivelAcessoController {
     }
 
     @PutMapping("/{accessLevelId}")
-    public ResponseEntity<NivelAcessoDTO> updateDateType(@PathVariable("accessLevelId") Long accessLevelId,
+    public ResponseEntity<NivelAcessoDTO> updateNivelAcesso(@PathVariable("accessLevelId") Long accessLevelId,
                                                       @Valid @RequestBody NivelAcessoDTO accessLevel){
         try {
             accessLevel.setId(accessLevelId);
