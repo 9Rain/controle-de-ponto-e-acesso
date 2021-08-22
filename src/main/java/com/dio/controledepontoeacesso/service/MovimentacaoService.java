@@ -2,6 +2,7 @@ package com.dio.controledepontoeacesso.service;
 
 import com.dio.controledepontoeacesso.exception.NoSuchElementException;
 import com.dio.controledepontoeacesso.exception.RelationshipNotFoundException;
+import com.dio.controledepontoeacesso.mapper.OcorrenciaMapper;
 import com.dio.controledepontoeacesso.model.Movimentacao;
 import com.dio.controledepontoeacesso.repository.MovimentacaoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,9 @@ public class MovimentacaoService {
     // UsuarioService usuarioService;
     CalendarioService calendarioService;
     OcorrenciaService ocorrenciaService;
+
+    @Autowired
+    OcorrenciaMapper ocorrenciaMapper;
 
     @Autowired
     public MovimentacaoService(MovimentacaoRepository movimentacaoRepository, // UsuarioService usuarioService,
@@ -38,11 +42,12 @@ public class MovimentacaoService {
         if(relatedOcorrenciaId.isPresent()) {
             var relatedOcorrencia = ocorrenciaService.getById(relatedOcorrenciaId.get());
 
-            if(relatedOcorrencia.isEmpty()) {
-                throw new RelationshipNotFoundException();
-            }
+//            if(relatedOcorrencia.isEmpty()) {
+//                throw new RelationshipNotFoundException();
+//            }
 
-            movimentacao.setOcorrencia(relatedOcorrencia.get());
+//            movimentacao.setOcorrencia(relatedOcorrencia.get());
+            movimentacao.setOcorrencia(ocorrenciaMapper.toOcorrencia(relatedOcorrencia));
         }
 
         var relatedCalendarioId = Optional.ofNullable(movimentacao.getCalendarioId());
@@ -86,11 +91,12 @@ public class MovimentacaoService {
         if(relatedOcorrenciaId.isPresent()) {
             var relatedOcorrencia = ocorrenciaService.getById(relatedOcorrenciaId.get());
 
-            if(relatedOcorrencia.isEmpty()) {
-                throw new RelationshipNotFoundException();
-            }
+//            if(relatedOcorrencia.isEmpty()) {
+//                throw new RelationshipNotFoundException();
+//            }
 
-            movimentacao.setOcorrencia(relatedOcorrencia.get());
+//            movimentacao.setOcorrencia(relatedOcorrencia.get());
+            movimentacao.setOcorrencia(ocorrenciaMapper.toOcorrencia(relatedOcorrencia));
         }
         else movimentacao.setOcorrencia(null);
 

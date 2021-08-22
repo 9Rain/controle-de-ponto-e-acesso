@@ -9,9 +9,9 @@ import java.util.List;
 
 @Mapper(componentModel="spring")
 public interface JornadaTrabalhoMapper {
-    JornadaTrabalhoDTO toJornadaTrabalhoDTO(JornadaTrabalho product);
+    JornadaTrabalhoDTO toJornadaTrabalhoDTO(JornadaTrabalho workingDay);
 
-    List<JornadaTrabalhoDTO> toJornadaTrabalhoDTOs(List<JornadaTrabalho> products);
+    List<JornadaTrabalhoDTO> toJornadaTrabalhoDTOs(List<JornadaTrabalho> workingDays);
 
-    JornadaTrabalho toJornadaTrabalho(JornadaTrabalhoDTO productDTO);
+    JornadaTrabalho toJornadaTrabalho(JornadaTrabalhoDTO workingDayDTO);
 }

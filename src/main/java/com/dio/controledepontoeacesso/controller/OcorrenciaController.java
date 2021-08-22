@@ -1,16 +1,18 @@
 package com.dio.controledepontoeacesso.controller;
 
-import com.dio.controledepontoeacesso.exception.NoSuchElementException;
-import com.dio.controledepontoeacesso.model.Ocorrencia;
+import com.dio.controledepontoeacesso.dto.OcorrenciaDTO;
+import com.dio.controledepontoeacesso.exception.NotFoundException;
+import com.dio.controledepontoeacesso.response.OcorrenciaResponse;
 import com.dio.controledepontoeacesso.service.OcorrenciaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/occurrences")
@@ -19,49 +21,48 @@ public class OcorrenciaController {
     OcorrenciaService ocorrenciaService;
 
     @PostMapping
-    public Ocorrencia createOcorrencia(@Valid @RequestBody Ocorrencia occurrence){
-        return ocorrenciaService.saveOcorrencia(occurrence);
+    public ResponseEntity<OcorrenciaDTO> createOcorrencia(@Valid @RequestBody OcorrenciaDTO occurrence){
+        return ResponseEntity.status(HttpStatus.CREATED).body(ocorrenciaService.saveOcorrencia(occurrence));
     }
 
     @GetMapping
-    public List<Ocorrencia> getOcorrenciaList(){
-        return ocorrenciaService.findAll();
+    public ResponseEntity<List<OcorrenciaDTO>> getOcorrenciaList(){
+        return ResponseEntity.ok(ocorrenciaService.findAll());
     }
 
     @GetMapping("/{occurrenceId}")
-    public ResponseEntity<Ocorrencia> getOcorrenciaByID(@PathVariable("occurrenceId") Long occurrenceId) {
-        return ocorrenciaService.getById(occurrenceId)
-                .map(occurrence -> ResponseEntity.ok().body(occurrence))
-                .orElseGet(() -> ResponseEntity.notFound().build());
+    public ResponseEntity<OcorrenciaDTO> getOcorrenciaByID(@PathVariable("occurrenceId") Long occurrenceId) {
+        try {
+            return ResponseEntity.ok(ocorrenciaService.getById(occurrenceId));
+        } catch (NotFoundException e) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, OcorrenciaResponse.ENTITY_NOT_FOUND, e);
+        }
     }
 
-    @PutMapping
-    public ResponseEntity<Ocorrencia> updateDateType(@Valid @RequestBody Ocorrencia occurrence){
-        var res = Optional.of(occurrence.getId());
-
-        if(res.isEmpty() || res.get() <= 0) return ResponseEntity.badRequest().build();
-
+    @PutMapping("/{occurrenceId}")
+    public ResponseEntity<OcorrenciaDTO> updateOcorrencia(@PathVariable("occurrenceId") Long occurrenceId,
+                                                          @Valid @RequestBody OcorrenciaDTO occurrence){
         try {
-            return ResponseEntity.ok().body(ocorrenciaService.updateOcorrencia(occurrence));
-        } catch (NoSuchElementException e) {
-            e.printStackTrace();
-            return ResponseEntity.notFound().build();
+            occurrence.setId(occurrenceId);
+            return ResponseEntity.ok(ocorrenciaService.updateOcorrencia(occurrence));
+        } catch (NotFoundException e) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, OcorrenciaResponse.ENTITY_NOT_FOUND, e);
         }
     }
 
     @DeleteMapping("/{occurrenceId}")
     public ResponseEntity deleteByID(@PathVariable("occurrenceId") Long occurrenceId) {
-        if(occurrenceId <= 0) return ResponseEntity.badRequest().build();
-
         try {
             ocorrenciaService.deleteOcorrencia(occurrenceId);
             return ResponseEntity.noContent().build();
         } catch (EmptyResultDataAccessException e){
-            e.printStackTrace();
-            return ResponseEntity.notFound().build();
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, OcorrenciaResponse.ENTITY_NOT_FOUND, e);
         } catch (Exception e){
-            e.printStackTrace();
-            return ResponseEntity.internalServerError().build();
+            throw new ResponseStatusException(
+                    HttpStatus.INTERNAL_SERVER_ERROR, OcorrenciaResponse.INTERNAL_SERVER_ERROR, e);
         }
     }
 }

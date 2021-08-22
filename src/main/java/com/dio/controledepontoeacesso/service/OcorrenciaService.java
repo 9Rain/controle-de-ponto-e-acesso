@@ -1,43 +1,53 @@
 package com.dio.controledepontoeacesso.service;
 
-import com.dio.controledepontoeacesso.exception.NoSuchElementException;
-import com.dio.controledepontoeacesso.model.Ocorrencia;
+import com.dio.controledepontoeacesso.dto.OcorrenciaDTO;
+import com.dio.controledepontoeacesso.exception.NotFoundException;
+import com.dio.controledepontoeacesso.mapper.OcorrenciaMapper;
 import com.dio.controledepontoeacesso.repository.OcorrenciaRepository;
+import com.dio.controledepontoeacesso.response.OcorrenciaResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class OcorrenciaService {
+    @Autowired
     OcorrenciaRepository ocorrenciaRepository;
 
     @Autowired
-    public OcorrenciaService(OcorrenciaRepository ocorrenciaRepository) {
-        this.ocorrenciaRepository = ocorrenciaRepository;
+    OcorrenciaMapper ocorrenciaMapper;
+
+    public OcorrenciaDTO saveOcorrencia(OcorrenciaDTO ocorrencia){
+        return ocorrenciaMapper.toOcorrenciaDTO(
+                ocorrenciaRepository.save(
+                        ocorrenciaMapper.toOcorrencia(ocorrencia)
+                )
+        );
     }
 
-    public Ocorrencia saveOcorrencia(Ocorrencia ocorrencia){
-        return ocorrenciaRepository.save(ocorrencia);
+    public List<OcorrenciaDTO> findAll() {
+        return ocorrenciaMapper.toOcorrenciaDTOs(ocorrenciaRepository.findAll());
     }
 
-    public List<Ocorrencia> findAll() {
-        return ocorrenciaRepository.findAll();
+    public OcorrenciaDTO getById(Long idOcorrencia) {
+        return ocorrenciaRepository.findById(idOcorrencia)
+                .map(ocorrenciaMapper::toOcorrenciaDTO)
+                .orElseThrow(() -> new NotFoundException(OcorrenciaResponse.ENTITY_NOT_FOUND));
     }
 
-    public Optional<Ocorrencia> getById(Long idOcorrencia) {
-        return ocorrenciaRepository.findById(idOcorrencia);
-    }
-
-    public Ocorrencia updateOcorrencia(Ocorrencia ocorrencia) throws NoSuchElementException {
-        var ocorrenciaToBeUpdated = this.getById(ocorrencia.getId());
+    public OcorrenciaDTO updateOcorrencia(OcorrenciaDTO ocorrencia) throws NotFoundException {
+        var ocorrenciaToBeUpdated = ocorrenciaRepository.findById(ocorrencia.getId());
 
         if(ocorrenciaToBeUpdated.isEmpty()) {
-            throw new NoSuchElementException();
+            throw new NotFoundException(OcorrenciaResponse.ENTITY_NOT_FOUND);
         }
 
-        return ocorrenciaRepository.save(ocorrencia);
+        return ocorrenciaMapper.toOcorrenciaDTO(
+                ocorrenciaRepository.save(
+                        ocorrenciaMapper.toOcorrencia(ocorrencia)
+                )
+        );
     }
 
     public void deleteOcorrencia(Long idOcorrencia) {
