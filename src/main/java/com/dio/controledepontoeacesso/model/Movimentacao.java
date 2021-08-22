@@ -3,7 +3,6 @@ package com.dio.controledepontoeacesso.model;
 import lombok.*;
 
 import javax.persistence.*;
-import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -15,21 +14,9 @@ import java.time.LocalDateTime;
 @Builder
 @Entity
 public class Movimentacao {
-    @Getter
-    @Setter
-    @AllArgsConstructor
-    @NoArgsConstructor
-    @EqualsAndHashCode
-    @Embeddable
-    public static class MovimentacaoId implements Serializable {
-        @GeneratedValue(strategy = GenerationType.IDENTITY)
-        private long idMovimento;
-
-        private long idUsuario;
-    }
     @Id
-    @EmbeddedId
-    private MovimentacaoId movimentacaoId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     private LocalDateTime dataEntrada;
 

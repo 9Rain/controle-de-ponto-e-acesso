@@ -49,9 +49,7 @@ public class MovimentacaoController {
     public ResponseEntity<MovimentacaoDTO> updateMovimentacao(@PathVariable("movementId") Long movementId,
                                                           @Valid @RequestBody MovimentacaoDTO movement){
         try {
-            var embbededAdditionalHourId = movement.getMovimentacaoId();
-            embbededAdditionalHourId.setIdMovimento(movementId);
-            movement.setMovimentacaoId(embbededAdditionalHourId);
+            movement.setId(movementId);
             return ResponseEntity.ok(movimentacaoService.updateMovimentacao(movement));
         } catch (NotFoundException e) {
             throw new ResponseStatusException(

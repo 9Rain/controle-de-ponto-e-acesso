@@ -16,12 +16,12 @@ import java.time.LocalDateTime;
 @Entity
 public class BancoHoras {
     @EqualsAndHashCode
-    @Embeddable
     @Getter
     @Setter
     @AllArgsConstructor
     @NoArgsConstructor
-    public class BancoHorasId implements Serializable {
+    @Embeddable
+    public static class BancoHorasId implements Serializable {
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         private long idBancoHoras;
 
@@ -29,6 +29,7 @@ public class BancoHoras {
 
         private long idUsuario;
     }
+
     @EmbeddedId
     private BancoHorasId bancoHorasId;
 

@@ -18,12 +18,12 @@ import java.time.LocalDateTime;
 @ToString
 
 public class BancoHorasDTO {
+    @Getter
+    @Setter
     @NoArgsConstructor
     @EqualsAndHashCode
     @Embeddable
-    @Getter
-    @Setter
-    public class BancoHorasId implements Serializable {
+    public static class BancoHorasId implements Serializable {
         private long idBancoHoras;
 
         @NotNull
@@ -32,8 +32,10 @@ public class BancoHorasDTO {
         @NotNull
         private long idUsuario;
     }
+
+    @NotNull
     @EmbeddedId
-    private BancoHoras.BancoHorasId bancoHorasId;
+    private BancoHorasId bancoHorasId;
 
     @NotNull
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy HH:mm:ss")

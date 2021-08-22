@@ -37,7 +37,7 @@ public class MovimentacaoService {
     }
 
     public MovimentacaoDTO updateMovimentacao(MovimentacaoDTO movimentacao) throws NotFoundException {
-        var movimentacaoToBeUpdated = movimentacaoRepository.findById(movimentacao.getMovimentacaoId().getIdMovimento());
+        var movimentacaoToBeUpdated = movimentacaoRepository.findById(movimentacao.getId());
 
         if(movimentacaoToBeUpdated.isEmpty()) {
             throw new NotFoundException(MovimentacaoResponse.ENTITY_NOT_FOUND);
