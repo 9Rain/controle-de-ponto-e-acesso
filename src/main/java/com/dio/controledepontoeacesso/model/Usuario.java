@@ -66,8 +66,8 @@ public class Usuario {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy HH:mm:ss")
     private LocalDateTime finalJornada;
 
-    private Long categoriaUsuarioId;
-    private Long empresaId;
-    private Long nivelAcessoId;
-    private Long jornadaTrabalhoId;
+    // private Long categoriaUsuarioId;
+    // private Long empresaId;
+    // private Long nivelAcessoId;
+    // private Long jornadaTrabalhoId;
 }

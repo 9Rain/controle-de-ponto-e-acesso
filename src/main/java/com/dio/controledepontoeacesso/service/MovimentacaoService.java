@@ -13,25 +13,25 @@ import java.util.Optional;
 @Service
 public class MovimentacaoService {
     MovimentacaoRepository movimentacaoRepository;
-    UsuarioService usuarioService;
+    // UsuarioService usuarioService;
     CalendarioService calendarioService;
     OcorrenciaService ocorrenciaService;
 
     @Autowired
-    public MovimentacaoService(MovimentacaoRepository movimentacaoRepository, UsuarioService usuarioService,
+    public MovimentacaoService(MovimentacaoRepository movimentacaoRepository, // UsuarioService usuarioService,
                                CalendarioService calendarioService, OcorrenciaService ocorrenciaService) {
         this.movimentacaoRepository = movimentacaoRepository;
-        this.usuarioService = usuarioService;
+        // this.usuarioService = usuarioService;
         this.calendarioService = calendarioService;
         this.ocorrenciaService = ocorrenciaService;
     }
 
     public Movimentacao saveMovimentacao(Movimentacao movimentacao) throws RelationshipNotFoundException {
-        var relatedUsuario = usuarioService.getById(movimentacao.getMovimentacaoId().getIdUsuario());
+        // var relatedUsuario = usuarioService.getById(movimentacao.getMovimentacaoId().getIdUsuario());
 
-        if(relatedUsuario.isEmpty()) {
-            throw new RelationshipNotFoundException();
-        }
+        // if(relatedUsuario.isEmpty()) {
+        // throw new RelationshipNotFoundException();
+        // }
 
         var relatedOcorrenciaId = Optional.ofNullable(movimentacao.getOcorrenciaId());
 
@@ -75,11 +75,11 @@ public class MovimentacaoService {
             throw new NoSuchElementException();
         }
 
-        var relatedUsuario = usuarioService.getById(movimentacao.getMovimentacaoId().getIdUsuario());
+        // var relatedUsuario = usuarioService.getById(movimentacao.getMovimentacaoId().getIdUsuario());
 
-        if(relatedUsuario.isEmpty()) {
-            throw new RelationshipNotFoundException();
-        }
+        // if(relatedUsuario.isEmpty()) {
+        // throw new RelationshipNotFoundException();
+        // }
 
         var relatedOcorrenciaId = Optional.ofNullable(movimentacao.getOcorrenciaId());
 

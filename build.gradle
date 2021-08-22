@@ -41,6 +41,8 @@ dependencies {
     implementation group: 'org.hibernate', name: 'hibernate-envers', version: '5.4.24.Final'
     implementation group: 'org.hibernate', name: 'hibernate-validator', version: '6.1.5.Final'
 
+    implementation 'org.mapstruct:mapstruct:1.4.2.Final'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.4.2.Final'
 
     testImplementation('org.springframework.boot:spring-boot-starter-test') {
         exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'

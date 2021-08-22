@@ -13,14 +13,14 @@ import java.util.Optional;
 @Service
 public class BancoHorasService {
     BancoHorasRepository bancoHorasRepository;
-    UsuarioService usuarioService;
+    // UsuarioService usuarioService;
     MovimentacaoService movimentacaoService;
 
     @Autowired
-    public BancoHorasService(BancoHorasRepository bancoHorasRepository, UsuarioService usuarioService,
+    public BancoHorasService(BancoHorasRepository bancoHorasRepository, // UsuarioService usuarioService,
                              MovimentacaoService movimentacaoService) {
         this.bancoHorasRepository = bancoHorasRepository;
-        this.usuarioService = usuarioService;
+        // this.usuarioService = usuarioService;
         this.movimentacaoService = movimentacaoService;
     }
 
@@ -31,11 +31,11 @@ public class BancoHorasService {
             throw new RelationshipNotFoundException();
         }
 
-        var relatedUsuario = usuarioService.getById(bancoHoras.getBancoHorasId().getIdUsuario());
+        // var relatedUsuario = usuarioService.getById(bancoHoras.getBancoHorasId().getIdUsuario());
 
-        if(relatedUsuario.isEmpty()) {
-            throw new RelationshipNotFoundException();
-        }
+        // if(relatedUsuario.isEmpty()) {
+        // throw new RelationshipNotFoundException();
+        // }
 
         return bancoHorasRepository.save(bancoHoras);
     }

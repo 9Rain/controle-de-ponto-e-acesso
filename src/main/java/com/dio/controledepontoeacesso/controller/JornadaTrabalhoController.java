@@ -1,16 +1,18 @@
 package com.dio.controledepontoeacesso.controller;
 
-import com.dio.controledepontoeacesso.exception.NoSuchElementException;
-import com.dio.controledepontoeacesso.model.JornadaTrabalho;
+import com.dio.controledepontoeacesso.dto.JornadaTrabalhoDTO;
+import com.dio.controledepontoeacesso.exception.NotFoundException;
+import com.dio.controledepontoeacesso.response.JornadaTrabalhoResponse;
 import com.dio.controledepontoeacesso.service.JornadaTrabalhoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/working-days")
@@ -19,49 +21,48 @@ public class JornadaTrabalhoController {
     JornadaTrabalhoService jornadaTrabalhoService;
 
     @PostMapping
-    public JornadaTrabalho createJornada(@Valid @RequestBody JornadaTrabalho jornadaTrabalho){
-        return jornadaTrabalhoService.saveJornada(jornadaTrabalho);
+    public ResponseEntity<JornadaTrabalhoDTO> createJornada(@Valid @RequestBody JornadaTrabalhoDTO jornadaTrabalho){
+        return ResponseEntity.status(HttpStatus.CREATED).body(jornadaTrabalhoService.saveJornada(jornadaTrabalho));
     }
 
     @GetMapping
-    public List<JornadaTrabalho> getJornadaList(){
-        return jornadaTrabalhoService.findAll();
+    public ResponseEntity<List<JornadaTrabalhoDTO>> getJornadaList(){
+        return ResponseEntity.ok(jornadaTrabalhoService.findAll());
     }
 
     @GetMapping("/{idJornada}")
-    public ResponseEntity<JornadaTrabalho> getJornadaByID(@PathVariable("idJornada") Long idJornada) {
-        return jornadaTrabalhoService.getById(idJornada)
-                .map(jornada -> ResponseEntity.ok().body(jornada))
-                .orElseGet(() -> ResponseEntity.notFound().build());
+    public ResponseEntity<JornadaTrabalhoDTO> getJornadaByID(@PathVariable("idJornada") Long idJornada) {
+        try {
+            return ResponseEntity.ok(jornadaTrabalhoService.getById(idJornada));
+        } catch (NotFoundException e) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, JornadaTrabalhoResponse.ENTITY_NOT_FOUND, e);
+        }
     }
 
-    @PutMapping
-    public ResponseEntity<JornadaTrabalho> updateJornada(@Valid @RequestBody JornadaTrabalho jornadaTrabalho){
-        var res = Optional.of(jornadaTrabalho.getId());
-
-        if(res.isEmpty() || res.get() <= 0) return ResponseEntity.badRequest().build();
-
+    @PutMapping("/{idJornada}")
+    public ResponseEntity<JornadaTrabalhoDTO> updateJornada(@PathVariable("idJornada") Long idJornada,
+                                                         @Valid @RequestBody JornadaTrabalhoDTO jornadaTrabalho){
         try {
-            return ResponseEntity.ok().body(jornadaTrabalhoService.updateJornada(jornadaTrabalho));
-        } catch (NoSuchElementException e) {
-            e.printStackTrace();
-            return ResponseEntity.notFound().build();
+            jornadaTrabalho.setId(idJornada);
+            return ResponseEntity.ok(jornadaTrabalhoService.updateJornada(jornadaTrabalho));
+        } catch (NotFoundException e) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, JornadaTrabalhoResponse.ENTITY_NOT_FOUND, e);
         }
     }
 
     @DeleteMapping("/{idJornada}")
     public ResponseEntity deleteByID(@PathVariable("idJornada") Long idJornada) {
-        if(idJornada <= 0) return ResponseEntity.badRequest().build();
-
         try {
             jornadaTrabalhoService.deleteJornada(idJornada);
             return ResponseEntity.noContent().build();
         } catch (EmptyResultDataAccessException e){
-            e.printStackTrace();
-            return ResponseEntity.notFound().build();
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, JornadaTrabalhoResponse.ENTITY_NOT_FOUND, e);
         } catch (Exception e){
-            e.printStackTrace();
-            return ResponseEntity.internalServerError().build();
+            throw new ResponseStatusException(
+                    HttpStatus.INTERNAL_SERVER_ERROR, JornadaTrabalhoResponse.INTERNAL_SERVER_ERROR, e);
         }
     }
 }
