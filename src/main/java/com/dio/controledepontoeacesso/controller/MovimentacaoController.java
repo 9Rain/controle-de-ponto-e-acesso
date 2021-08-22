@@ -1,13 +1,19 @@
 package com.dio.controledepontoeacesso.controller;
 
+import com.dio.controledepontoeacesso.dto.MovimentacaoDTO;
 import com.dio.controledepontoeacesso.exception.NoSuchElementException;
+import com.dio.controledepontoeacesso.exception.NotFoundException;
 import com.dio.controledepontoeacesso.exception.RelationshipNotFoundException;
 import com.dio.controledepontoeacesso.model.Movimentacao;
+import com.dio.controledepontoeacesso.response.MovimentacaoResponse;
+import com.dio.controledepontoeacesso.service.MovimentacaoService;
 import com.dio.controledepontoeacesso.service.MovimentacaoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -20,72 +26,50 @@ public class MovimentacaoController {
     MovimentacaoService movimentacaoService;
 
     @PostMapping
-    public ResponseEntity<Movimentacao> createMovimentacao(@Valid @RequestBody Movimentacao movement){
-        var userId = Optional.ofNullable(movement.getMovimentacaoId().getIdUsuario());
-
-        if(userId.isEmpty() || userId.get() <= 0) return ResponseEntity.badRequest().build();
-
-        try {
-            var res = movimentacaoService.saveMovimentacao(movement);
-            return ResponseEntity.ok().body(res);
-        } catch (RelationshipNotFoundException e) {
-            e.printStackTrace();
-            return ResponseEntity.badRequest().build();
-        } catch (Exception e){
-            e.printStackTrace();
-            return ResponseEntity.internalServerError().build();
-        }
+    public ResponseEntity<MovimentacaoDTO> createMovimentacao(@Valid @RequestBody MovimentacaoDTO movement){
+        return ResponseEntity.status(HttpStatus.CREATED).body(movimentacaoService.saveMovimentacao(movement));
     }
 
     @GetMapping
-    public List<Movimentacao> getMovimentacaoList(){
-        return movimentacaoService.findAll();
+    public ResponseEntity<List<MovimentacaoDTO>> getMovimentacaoList(){
+        return ResponseEntity.ok(movimentacaoService.findAll());
     }
 
     @GetMapping("/{movementId}")
-    public ResponseEntity<Movimentacao> getMovimentacaoByID(@PathVariable("movementId") Long movementId) {
-        return movimentacaoService.getById(movementId)
-                .map(movement -> ResponseEntity.ok().body(movement))
-                .orElseGet(() -> ResponseEntity.notFound().build());
+    public ResponseEntity<MovimentacaoDTO> getMovimentacaoByID(@PathVariable("movementId") Long movementId) {
+        try {
+            return ResponseEntity.ok(movimentacaoService.getById(movementId));
+        } catch (NotFoundException e) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, MovimentacaoResponse.ENTITY_NOT_FOUND, e);
+        }
     }
 
-    @PutMapping
-    public ResponseEntity<Movimentacao> updateDateType(@Valid @RequestBody Movimentacao movement){
-        var movementId = Optional.ofNullable(movement.getMovimentacaoId().getIdMovimento());
-
-        if(movementId.isEmpty() || movementId.get() <= 0) return ResponseEntity.badRequest().build();
-
-        var userId = Optional.ofNullable(movement.getMovimentacaoId().getIdUsuario());
-
-        if(userId.isEmpty() || userId.get() <= 0) return ResponseEntity.badRequest().build();
-
+    @PutMapping("/{movementId}")
+    public ResponseEntity<MovimentacaoDTO> updateMovimentacao(@PathVariable("movementId") Long movementId,
+                                                          @Valid @RequestBody MovimentacaoDTO movement){
         try {
-            return ResponseEntity.ok().body(movimentacaoService.updateMovimentacao(movement));
-        } catch (RelationshipNotFoundException e) {
-            e.printStackTrace();
-            return ResponseEntity.badRequest().build();
-        } catch (NoSuchElementException e) {
-            e.printStackTrace();
-            return ResponseEntity.notFound().build();
-        } catch (Exception e){
-            e.printStackTrace();
-            return ResponseEntity.internalServerError().build();
+            var embbededAdditionalHourId = movement.getMovimentacaoId();
+            embbededAdditionalHourId.setIdMovimento(movementId);
+            movement.setMovimentacaoId(embbededAdditionalHourId);
+            return ResponseEntity.ok(movimentacaoService.updateMovimentacao(movement));
+        } catch (NotFoundException e) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, MovimentacaoResponse.ENTITY_NOT_FOUND, e);
         }
     }
 
     @DeleteMapping("/{movementId}")
-    public ResponseEntity deleteByID(@PathVariable("movementId") Long movementId) {
-        if(movementId <= 0) return ResponseEntity.badRequest().build();
-
+    public ResponseEntity deleteMovimentacaoByID(@PathVariable("movementId") Long movementId) {
         try {
             movimentacaoService.deleteMovimentacao(movementId);
             return ResponseEntity.noContent().build();
         } catch (EmptyResultDataAccessException e){
-            e.printStackTrace();
-            return ResponseEntity.notFound().build();
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, MovimentacaoResponse.ENTITY_NOT_FOUND, e);
         } catch (Exception e){
-            e.printStackTrace();
-            return ResponseEntity.internalServerError().build();
+            throw new ResponseStatusException(
+                    HttpStatus.INTERNAL_SERVER_ERROR, MovimentacaoResponse.INTERNAL_SERVER_ERROR, e);
         }
     }
 }

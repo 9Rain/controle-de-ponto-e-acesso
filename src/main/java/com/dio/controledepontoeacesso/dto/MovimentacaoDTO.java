@@ -1,20 +1,22 @@
-package com.dio.controledepontoeacesso.model;
+package com.dio.controledepontoeacesso.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @EqualsAndHashCode
-@Builder
-@Entity
-public class Movimentacao {
+@ToString
+
+public class MovimentacaoDTO {
     @Getter
     @Setter
     @AllArgsConstructor
@@ -22,18 +24,23 @@ public class Movimentacao {
     @EqualsAndHashCode
     @Embeddable
     public static class MovimentacaoId implements Serializable {
-        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        @NotNull
         private long idMovimento;
 
+        @NotNull
         private long idUsuario;
     }
-    @Id
-    @EmbeddedId
+    @NotNull
     private MovimentacaoId movimentacaoId;
 
+    @NotNull
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy HH:mm:ss")
     private LocalDateTime dataEntrada;
 
+    @NotNull
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy HH:mm:ss")
     private LocalDateTime dataSaida;
 
+    @NotNull
     private BigDecimal periodo;
 }

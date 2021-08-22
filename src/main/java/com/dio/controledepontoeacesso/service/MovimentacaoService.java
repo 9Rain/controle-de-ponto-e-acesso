@@ -1,121 +1,53 @@
 package com.dio.controledepontoeacesso.service;
 
-import com.dio.controledepontoeacesso.exception.NoSuchElementException;
-import com.dio.controledepontoeacesso.exception.RelationshipNotFoundException;
-import com.dio.controledepontoeacesso.mapper.OcorrenciaMapper;
-import com.dio.controledepontoeacesso.model.Movimentacao;
+import com.dio.controledepontoeacesso.dto.MovimentacaoDTO;
+import com.dio.controledepontoeacesso.exception.NotFoundException;
+import com.dio.controledepontoeacesso.mapper.MovimentacaoMapper;
 import com.dio.controledepontoeacesso.repository.MovimentacaoRepository;
+import com.dio.controledepontoeacesso.response.MovimentacaoResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class MovimentacaoService {
+    @Autowired
     MovimentacaoRepository movimentacaoRepository;
-    // UsuarioService usuarioService;
-    CalendarioService calendarioService;
-    OcorrenciaService ocorrenciaService;
 
     @Autowired
-    OcorrenciaMapper ocorrenciaMapper;
+    MovimentacaoMapper movimentacaoMapper;
 
-    @Autowired
-    public MovimentacaoService(MovimentacaoRepository movimentacaoRepository, // UsuarioService usuarioService,
-                               CalendarioService calendarioService, OcorrenciaService ocorrenciaService) {
-        this.movimentacaoRepository = movimentacaoRepository;
-        // this.usuarioService = usuarioService;
-        this.calendarioService = calendarioService;
-        this.ocorrenciaService = ocorrenciaService;
+    public MovimentacaoDTO saveMovimentacao(MovimentacaoDTO movimentacao){
+        return movimentacaoMapper.toMovimentacaoDTO(
+                movimentacaoRepository.save(
+                        movimentacaoMapper.toMovimentacao(movimentacao)
+                )
+        );
     }
 
-    public Movimentacao saveMovimentacao(Movimentacao movimentacao) throws RelationshipNotFoundException {
-        // var relatedUsuario = usuarioService.getById(movimentacao.getMovimentacaoId().getIdUsuario());
-
-        // if(relatedUsuario.isEmpty()) {
-        // throw new RelationshipNotFoundException();
-        // }
-
-        var relatedOcorrenciaId = Optional.ofNullable(movimentacao.getOcorrenciaId());
-
-        if(relatedOcorrenciaId.isPresent()) {
-            var relatedOcorrencia = ocorrenciaService.getById(relatedOcorrenciaId.get());
-
-//            if(relatedOcorrencia.isEmpty()) {
-//                throw new RelationshipNotFoundException();
-//            }
-
-//            movimentacao.setOcorrencia(relatedOcorrencia.get());
-            movimentacao.setOcorrencia(ocorrenciaMapper.toOcorrencia(relatedOcorrencia));
-        }
-
-        var relatedCalendarioId = Optional.ofNullable(movimentacao.getCalendarioId());
-
-        if(relatedCalendarioId.isPresent()) {
-//            var relatedCalendario = calendarioRepository.findById(relatedCalendarioId.get());
-
-//            if(relatedCalendario.isEmpty()) {
-//                throw new RelationshipNotFoundException();
-//            }
-
-//            movimentacao.setCalendario(relatedCalendario.get());
-            movimentacao.setCalendario(null);
-        }
-
-        return movimentacaoRepository.save(movimentacao);
+    public List<MovimentacaoDTO> findAll() {
+        return movimentacaoMapper.toMovimentacaoDTOs(movimentacaoRepository.findAll());
     }
 
-    public List<Movimentacao> findAll() {
-        return movimentacaoRepository.findAll();
+    public MovimentacaoDTO getById(Long idMovimentacao) throws NotFoundException {
+        return movimentacaoRepository.findById(idMovimentacao)
+                .map(movimentacaoMapper::toMovimentacaoDTO)
+                .orElseThrow(() -> new NotFoundException(MovimentacaoResponse.ENTITY_NOT_FOUND));
     }
 
-    public Optional<Movimentacao> getById(Long idMovimentacao) {
-        return movimentacaoRepository.findById(idMovimentacao);
-    }
-
-    public Movimentacao updateMovimentacao(Movimentacao movimentacao) throws NoSuchElementException, RelationshipNotFoundException {
-        var movimentacaoToBeUpdated = this.getById(movimentacao.getMovimentacaoId().getIdMovimento());
+    public MovimentacaoDTO updateMovimentacao(MovimentacaoDTO movimentacao) throws NotFoundException {
+        var movimentacaoToBeUpdated = movimentacaoRepository.findById(movimentacao.getMovimentacaoId().getIdMovimento());
 
         if(movimentacaoToBeUpdated.isEmpty()) {
-            throw new NoSuchElementException();
+            throw new NotFoundException(MovimentacaoResponse.ENTITY_NOT_FOUND);
         }
 
-        // var relatedUsuario = usuarioService.getById(movimentacao.getMovimentacaoId().getIdUsuario());
-
-        // if(relatedUsuario.isEmpty()) {
-        // throw new RelationshipNotFoundException();
-        // }
-
-        var relatedOcorrenciaId = Optional.ofNullable(movimentacao.getOcorrenciaId());
-
-        if(relatedOcorrenciaId.isPresent()) {
-            var relatedOcorrencia = ocorrenciaService.getById(relatedOcorrenciaId.get());
-
-//            if(relatedOcorrencia.isEmpty()) {
-//                throw new RelationshipNotFoundException();
-//            }
-
-//            movimentacao.setOcorrencia(relatedOcorrencia.get());
-            movimentacao.setOcorrencia(ocorrenciaMapper.toOcorrencia(relatedOcorrencia));
-        }
-        else movimentacao.setOcorrencia(null);
-
-        var relatedCalendarioId = Optional.ofNullable(movimentacao.getCalendarioId());
-
-        if(relatedCalendarioId.isPresent()) {
-//            var relatedCalendario = calendarioService.getById(relatedCalendarioId.get());
-//
-//            if(relatedCalendario.isEmpty()) {
-//                throw new RelationshipNotFoundException();
-//            }
-//
-//            movimentacao.setCalendario(relatedCalendario.get());
-            movimentacao.setCalendario(null);
-        }
-        else movimentacao.setCalendario(null);
-
-        return movimentacaoRepository.save(movimentacao);
+        return movimentacaoMapper.toMovimentacaoDTO(
+                movimentacaoRepository.save(
+                        movimentacaoMapper.toMovimentacao(movimentacao)
+                )
+        );
     }
 
     public void deleteMovimentacao(Long idMovimentacao) {
