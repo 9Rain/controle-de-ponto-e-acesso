@@ -3,7 +3,6 @@ package com.dio.controledepontoeacesso.model;
 import lombok.*;
 
 import javax.persistence.*;
-import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -15,23 +14,9 @@ import java.time.LocalDateTime;
 @Builder
 @Entity
 public class BancoHoras {
-    @EqualsAndHashCode
-    @Getter
-    @Setter
-    @AllArgsConstructor
-    @NoArgsConstructor
-    @Embeddable
-    public static class BancoHorasId implements Serializable {
-        @GeneratedValue(strategy = GenerationType.IDENTITY)
-        private long idBancoHoras;
-
-        private long idMovimentacao;
-
-        private long idUsuario;
-    }
-
-    @EmbeddedId
-    private BancoHorasId bancoHorasId;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     private LocalDateTime dataTrabalhada;
 

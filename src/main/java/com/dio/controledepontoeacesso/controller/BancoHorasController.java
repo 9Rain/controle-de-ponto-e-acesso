@@ -1,12 +1,8 @@
 package com.dio.controledepontoeacesso.controller;
 
 import com.dio.controledepontoeacesso.dto.BancoHorasDTO;
-import com.dio.controledepontoeacesso.exception.NoSuchElementException;
 import com.dio.controledepontoeacesso.exception.NotFoundException;
-import com.dio.controledepontoeacesso.exception.RelationshipNotFoundException;
-import com.dio.controledepontoeacesso.model.BancoHoras;
 import com.dio.controledepontoeacesso.response.BancoHorasResponse;
-import com.dio.controledepontoeacesso.service.BancoHorasService;
 import com.dio.controledepontoeacesso.service.BancoHorasService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -49,9 +45,7 @@ public class BancoHorasController {
     public ResponseEntity<BancoHorasDTO> updateBancoHoras(@PathVariable("additionalHourId") Long additionalHourId,
                                                     @Valid @RequestBody BancoHorasDTO additionalHour){
         try {
-            var embbededAdditionalHourId = additionalHour.getBancoHorasId();
-            embbededAdditionalHourId.setIdBancoHoras(additionalHourId);
-            additionalHour.setBancoHorasId(embbededAdditionalHourId);
+            additionalHour.setId(additionalHourId);
             return ResponseEntity.ok(bancoHorasService.updateBancoHoras(additionalHour));
         } catch (NotFoundException e) {
             throw new ResponseStatusException(

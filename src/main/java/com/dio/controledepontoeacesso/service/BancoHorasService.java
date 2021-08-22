@@ -1,19 +1,14 @@
 package com.dio.controledepontoeacesso.service;
 
 import com.dio.controledepontoeacesso.dto.BancoHorasDTO;
-import com.dio.controledepontoeacesso.exception.NoSuchElementException;
 import com.dio.controledepontoeacesso.exception.NotFoundException;
-import com.dio.controledepontoeacesso.exception.RelationshipNotFoundException;
 import com.dio.controledepontoeacesso.mapper.BancoHorasMapper;
-import com.dio.controledepontoeacesso.model.BancoHoras;
-import com.dio.controledepontoeacesso.repository.BancoHorasRepository;
 import com.dio.controledepontoeacesso.repository.BancoHorasRepository;
 import com.dio.controledepontoeacesso.response.BancoHorasResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class BancoHorasService {
@@ -42,7 +37,7 @@ public class BancoHorasService {
     }
 
     public BancoHorasDTO updateBancoHoras(BancoHorasDTO bancoHoras) throws NotFoundException {
-        var bancoHorasToBeUpdated = bancoHorasRepository.findById(bancoHoras.getBancoHorasId().getIdBancoHoras());
+        var bancoHorasToBeUpdated = bancoHorasRepository.findById(bancoHoras.getId());
 
         if(bancoHorasToBeUpdated.isEmpty()) {
             throw new NotFoundException(BancoHorasResponse.ENTITY_NOT_FOUND);
