@@ -1,15 +1,14 @@
 package com.dio.controledepontoeacesso.service;
 
-import com.dio.controledepontoeacesso.exception.NoSuchElementException;
-import com.dio.controledepontoeacesso.exception.RelationshipNotFoundException;
-import com.dio.controledepontoeacesso.mapper.TipoDataMapper;
-import com.dio.controledepontoeacesso.model.Calendario;
+import com.dio.controledepontoeacesso.dto.CalendarioDTO;
+import com.dio.controledepontoeacesso.exception.NotFoundException;
+import com.dio.controledepontoeacesso.mapper.CalendarioMapper;
 import com.dio.controledepontoeacesso.repository.CalendarioRepository;
+import com.dio.controledepontoeacesso.response.CalendarioResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class CalendarioService {
@@ -17,50 +16,39 @@ public class CalendarioService {
     CalendarioRepository calendarioRepository;
 
     @Autowired
-    TipoDataService tipoDataService;
-
-    @Autowired
-    TipoDataMapper tipoDataMapper;
+    CalendarioMapper calendarioMapper;
 
 
-    public Calendario saveCalendario(Calendario calendario) {
-        var relatedTipoData = tipoDataService.getById(calendario.getTipoDataId());
-
-//        if(relatedTipoData.isEmpty()) {
-//            throw new RelationshipNotFoundException();
-//        }
-
-        calendario.setTipoData(tipoDataMapper.toTipoData(relatedTipoData));
-//        calendario.setTipoData(relatedTipoData.get());
-
-        return calendarioRepository.save(calendario);
+    public CalendarioDTO saveCalendario(CalendarioDTO calendario) {
+        return calendarioMapper.toCalendarioDTO(
+                calendarioRepository.save(
+                        calendarioMapper.toCalendario(calendario)
+                )
+        );
     }
 
-    public List<Calendario> findAll() {
-        return calendarioRepository.findAll();
+    public List<CalendarioDTO> findAll() {
+        return calendarioMapper.toCalendarioDTOs(calendarioRepository.findAll());
     }
 
-    public Optional<Calendario> getById(Long idCalendario) {
-        return calendarioRepository.findById(idCalendario);
+    public CalendarioDTO getById(Long idCalendario) throws NotFoundException {
+        return calendarioRepository.findById(idCalendario)
+                .map(calendarioMapper::toCalendarioDTO)
+                .orElseThrow(() -> new NotFoundException(CalendarioResponse.ENTITY_NOT_FOUND));
     }
 
-    public Calendario updateCalendario(Calendario calendario) throws NoSuchElementException {
-        var calendarioToBeUpdated = this.getById(calendario.getId());
+    public CalendarioDTO updateCalendario(CalendarioDTO calendario) throws NotFoundException {
+        var calendarioToBeUpdated = calendarioRepository.findById(calendario.getId());
 
         if(calendarioToBeUpdated.isEmpty()) {
-            throw new NoSuchElementException();
+            throw new NotFoundException(CalendarioResponse.ENTITY_NOT_FOUND);
         }
 
-        var relatedTipoData = tipoDataService.getById(calendario.getTipoDataId());
-
-//        if(relatedTipoData.isEmpty()) {
-//            throw new RelationshipNotFoundException();
-//        }
-
-//        calendario.setTipoData(relatedTipoData.get());
-        calendario.setTipoData(tipoDataMapper.toTipoData(relatedTipoData));
-
-        return calendarioRepository.save(calendario);
+        return calendarioMapper.toCalendarioDTO(
+                calendarioRepository.save(
+                        calendarioMapper.toCalendario(calendario)
+                )
+        );
     }
 
     public void deleteCalendario(Long idCalendario) {

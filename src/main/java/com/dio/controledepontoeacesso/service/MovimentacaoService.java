@@ -53,13 +53,14 @@ public class MovimentacaoService {
         var relatedCalendarioId = Optional.ofNullable(movimentacao.getCalendarioId());
 
         if(relatedCalendarioId.isPresent()) {
-            var relatedCalendario = calendarioService.getById(relatedCalendarioId.get());
+//            var relatedCalendario = calendarioRepository.findById(relatedCalendarioId.get());
 
-            if(relatedCalendario.isEmpty()) {
-                throw new RelationshipNotFoundException();
-            }
+//            if(relatedCalendario.isEmpty()) {
+//                throw new RelationshipNotFoundException();
+//            }
 
-            movimentacao.setCalendario(relatedCalendario.get());
+//            movimentacao.setCalendario(relatedCalendario.get());
+            movimentacao.setCalendario(null);
         }
 
         return movimentacaoRepository.save(movimentacao);
@@ -103,13 +104,14 @@ public class MovimentacaoService {
         var relatedCalendarioId = Optional.ofNullable(movimentacao.getCalendarioId());
 
         if(relatedCalendarioId.isPresent()) {
-            var relatedCalendario = calendarioService.getById(relatedCalendarioId.get());
-
-            if(relatedCalendario.isEmpty()) {
-                throw new RelationshipNotFoundException();
-            }
-
-            movimentacao.setCalendario(relatedCalendario.get());
+//            var relatedCalendario = calendarioService.getById(relatedCalendarioId.get());
+//
+//            if(relatedCalendario.isEmpty()) {
+//                throw new RelationshipNotFoundException();
+//            }
+//
+//            movimentacao.setCalendario(relatedCalendario.get());
+            movimentacao.setCalendario(null);
         }
         else movimentacao.setCalendario(null);
 
