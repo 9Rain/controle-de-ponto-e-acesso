@@ -1,8 +1,10 @@
 package com.dio.controledepontoeacesso.service;
 
-import com.dio.controledepontoeacesso.exception.NoSuchElementException;
-import com.dio.controledepontoeacesso.model.NivelAcesso;
+import com.dio.controledepontoeacesso.dto.NivelAcessoDTO;
+import com.dio.controledepontoeacesso.exception.NotFoundException;
+import com.dio.controledepontoeacesso.mapper.NivelAcessoMapper;
 import com.dio.controledepontoeacesso.repository.NivelAcessoRepository;
+import com.dio.controledepontoeacesso.response.NivelAcessoResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -11,36 +13,42 @@ import java.util.Optional;
 
 @Service
 public class NivelAcessoService {
+    @Autowired
     NivelAcessoRepository nivelAcessoRepository;
 
     @Autowired
-    public NivelAcessoService(NivelAcessoRepository nivelAcessoRepository) {
-        this.nivelAcessoRepository = nivelAcessoRepository;
+    NivelAcessoMapper nivelAcessoMapper;
+
+    public NivelAcessoDTO saveNivelAcesso(NivelAcessoDTO nivelAcesso){
+        return nivelAcessoMapper.toNivelAcessoDTO(
+                nivelAcessoRepository.save(
+                        nivelAcessoMapper.toNivelAcesso(nivelAcesso)
+                )
+        );
     }
 
-    public NivelAcesso saveNivelAcesso(NivelAcesso nivelAcesso){
-        nivelAcesso.setLocalidades(null);
-        return nivelAcessoRepository.save(nivelAcesso);
+    public List<NivelAcessoDTO> findAll() {
+        return nivelAcessoMapper.toNivelAcessoDTOs(nivelAcessoRepository.findAll());
     }
 
-    public List<NivelAcesso> findAll() {
-        return nivelAcessoRepository.findAll();
+    public NivelAcessoDTO getById(Long idNivelAcesso) throws NotFoundException {
+        return nivelAcessoRepository.findById(idNivelAcesso)
+                .map(nivelAcessoMapper::toNivelAcessoDTO)
+                .orElseThrow(() -> new NotFoundException(NivelAcessoResponse.ENTITY_NOT_FOUND));
     }
 
-    public Optional<NivelAcesso> getById(Long idNivelAcesso) {
-        return nivelAcessoRepository.findById(idNivelAcesso);
-    }
-
-    public NivelAcesso updateNivelAcesso(NivelAcesso nivelAcesso) throws NoSuchElementException {
-        var nivelAcessoToBeUpdated = this.getById(nivelAcesso.getId());
+    public NivelAcessoDTO updateNivelAcesso(NivelAcessoDTO nivelAcesso) throws NotFoundException {
+        var nivelAcessoToBeUpdated = nivelAcessoRepository.findById(nivelAcesso.getId());
 
         if(nivelAcessoToBeUpdated.isEmpty()) {
-            throw new NoSuchElementException();
+            throw new NotFoundException(NivelAcessoResponse.ENTITY_NOT_FOUND);
         }
 
-        nivelAcesso.setLocalidades(nivelAcessoToBeUpdated.get().getLocalidades());
-
-        return nivelAcessoRepository.save(nivelAcesso);
+        return nivelAcessoMapper.toNivelAcessoDTO(
+                nivelAcessoRepository.save(
+                        nivelAcessoMapper.toNivelAcesso(nivelAcesso)
+                )
+        );
     }
 
     public void deleteNivelAcesso(Long idNivelAcesso) {

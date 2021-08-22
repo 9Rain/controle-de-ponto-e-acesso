@@ -26,7 +26,7 @@ public class CategoriaUsuarioController {
 
     @PostMapping
     public ResponseEntity<CategoriaUsuarioDTO> createCategoriaUsuario(@Valid @RequestBody CategoriaUsuarioDTO categoriaUsuario){
-        return ResponseEntity.ok(categoriaUsuarioService.saveCategoriaUsuario(categoriaUsuario));
+        return ResponseEntity.status(HttpStatus.CREATED).body(categoriaUsuarioService.saveCategoriaUsuario(categoriaUsuario));
     }
 
     @GetMapping

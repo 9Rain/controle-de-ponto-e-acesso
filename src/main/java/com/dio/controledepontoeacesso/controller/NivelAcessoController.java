@@ -1,12 +1,18 @@
 package com.dio.controledepontoeacesso.controller;
 
+import com.dio.controledepontoeacesso.dto.NivelAcessoDTO;
 import com.dio.controledepontoeacesso.exception.NoSuchElementException;
+import com.dio.controledepontoeacesso.exception.NotFoundException;
 import com.dio.controledepontoeacesso.model.NivelAcesso;
+import com.dio.controledepontoeacesso.response.NivelAcessoResponse;
+import com.dio.controledepontoeacesso.response.OcorrenciaResponse;
 import com.dio.controledepontoeacesso.service.NivelAcessoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -19,33 +25,34 @@ public class NivelAcessoController {
     NivelAcessoService nivelAcessoService;
 
     @PostMapping
-    public NivelAcesso createNivelAcesso(@Valid @RequestBody NivelAcesso accessLevel){
-        return nivelAcessoService.saveNivelAcesso(accessLevel);
+    public ResponseEntity<NivelAcessoDTO> createNivelAcesso(@Valid @RequestBody NivelAcessoDTO accessLevel){
+        return ResponseEntity.status(HttpStatus.CREATED).body(nivelAcessoService.saveNivelAcesso(accessLevel));
     }
 
     @GetMapping
-    public List<NivelAcesso> getNivelAcessoList(){
-        return nivelAcessoService.findAll();
+    public ResponseEntity<List<NivelAcessoDTO>> getNivelAcessoList(){
+        return ResponseEntity.ok(nivelAcessoService.findAll());
     }
 
     @GetMapping("/{accessLevelId}")
-    public ResponseEntity<NivelAcesso> getNivelAcessoByID(@PathVariable("accessLevelId") Long accessLevelId) {
-        return nivelAcessoService.getById(accessLevelId)
-                .map(accessLevel -> ResponseEntity.ok().body(accessLevel))
-                .orElseGet(() -> ResponseEntity.notFound().build());
+    public ResponseEntity<NivelAcessoDTO> getNivelAcessoByID(@PathVariable("accessLevelId") Long accessLevelId) {
+        try {
+            return ResponseEntity.ok(nivelAcessoService.getById(accessLevelId));
+        } catch (NotFoundException e) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, NivelAcessoResponse.ENTITY_NOT_FOUND, e);
+        }
     }
 
-    @PutMapping
-    public ResponseEntity<NivelAcesso> updateDateType(@Valid @RequestBody NivelAcesso accessLevel){
-        var res = Optional.ofNullable(accessLevel.getId());
-
-        if(res.isEmpty() || res.get() <= 0) return ResponseEntity.badRequest().build();
-
+    @PutMapping("/{accessLevelId}")
+    public ResponseEntity<NivelAcessoDTO> updateDateType(@PathVariable("accessLevelId") Long accessLevelId,
+                                                      @Valid @RequestBody NivelAcessoDTO accessLevel){
         try {
-            return ResponseEntity.ok().body(nivelAcessoService.updateNivelAcesso(accessLevel));
-        } catch (NoSuchElementException e) {
-            e.printStackTrace();
-            return ResponseEntity.notFound().build();
+            accessLevel.setId(accessLevelId);
+            return ResponseEntity.ok(nivelAcessoService.updateNivelAcesso(accessLevel));
+        } catch (NotFoundException e) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, NivelAcessoResponse.ENTITY_NOT_FOUND, e);
         }
     }
 
@@ -57,11 +64,11 @@ public class NivelAcessoController {
             nivelAcessoService.deleteNivelAcesso(accessLevelId);
             return ResponseEntity.noContent().build();
         } catch (EmptyResultDataAccessException e){
-            e.printStackTrace();
-            return ResponseEntity.notFound().build();
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, NivelAcessoResponse.ENTITY_NOT_FOUND, e);
         } catch (Exception e){
-            e.printStackTrace();
-            return ResponseEntity.internalServerError().build();
+            throw new ResponseStatusException(
+                    HttpStatus.INTERNAL_SERVER_ERROR, NivelAcessoResponse.INTERNAL_SERVER_ERROR, e);
         }
     }
 }
