@@ -1,8 +1,13 @@
 package com.dio.controledepontoeacesso.service;
 
+import com.dio.controledepontoeacesso.dto.CategoriaUsuarioDTO;
 import com.dio.controledepontoeacesso.exception.NoSuchElementException;
+import com.dio.controledepontoeacesso.exception.NotFoundException;
+import com.dio.controledepontoeacesso.mapper.CategoriaUsuarioMapper;
 import com.dio.controledepontoeacesso.model.CategoriaUsuario;
 import com.dio.controledepontoeacesso.repository.CategoriaUsuarioRepository;
+import com.dio.controledepontoeacesso.response.CategoriaUsuarioResponse;
+import com.dio.controledepontoeacesso.response.OcorrenciaResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -11,33 +16,42 @@ import java.util.Optional;
 
 @Service
 public class CategoriaUsuarioService {
+    @Autowired
     CategoriaUsuarioRepository categoriaUsuarioRepository;
 
     @Autowired
-    public CategoriaUsuarioService(CategoriaUsuarioRepository categoriaUsuarioRepository) {
-        this.categoriaUsuarioRepository = categoriaUsuarioRepository;
+    CategoriaUsuarioMapper categoriaUsuarioMapper;
+
+    public CategoriaUsuarioDTO saveCategoriaUsuario(CategoriaUsuarioDTO categoriaUsuario){
+        return categoriaUsuarioMapper.toCategoriaUsuarioDTO(
+                categoriaUsuarioRepository.save(
+                        categoriaUsuarioMapper.toCategoriaUsuario(categoriaUsuario)
+                )
+        );
     }
 
-    public CategoriaUsuario saveCategoriaUsuario(CategoriaUsuario categoriaUsuario){
-        return categoriaUsuarioRepository.save(categoriaUsuario);
+    public List<CategoriaUsuarioDTO> findAll() {
+        return categoriaUsuarioMapper.toCategoriaUsuarioDTOs(categoriaUsuarioRepository.findAll());
     }
 
-    public List<CategoriaUsuario> findAll() {
-        return categoriaUsuarioRepository.findAll();
+    public CategoriaUsuarioDTO getById(Long idCategoriaUsuario) throws NotFoundException {
+        return categoriaUsuarioRepository.findById(idCategoriaUsuario)
+                .map(categoriaUsuarioMapper::toCategoriaUsuarioDTO)
+                .orElseThrow(() -> new NotFoundException(CategoriaUsuarioResponse.ENTITY_NOT_FOUND));
     }
 
-    public Optional<CategoriaUsuario> getById(Long idCategoriaUsuario) {
-        return categoriaUsuarioRepository.findById(idCategoriaUsuario);
-    }
-
-    public CategoriaUsuario updateCategoriaUsuario(CategoriaUsuario categoriaUsuario) throws NoSuchElementException {
-        var categoriaUsuarioToBeUpdated = this.getById(categoriaUsuario.getId());
+    public CategoriaUsuarioDTO updateCategoriaUsuario(CategoriaUsuarioDTO categoriaUsuario) throws NotFoundException {
+        var categoriaUsuarioToBeUpdated = categoriaUsuarioRepository.findById(categoriaUsuario.getId());
 
         if(categoriaUsuarioToBeUpdated.isEmpty()) {
-            throw new NoSuchElementException();
+            throw new NotFoundException(CategoriaUsuarioResponse.ENTITY_NOT_FOUND);
         }
 
-        return categoriaUsuarioRepository.save(categoriaUsuario);
+        return categoriaUsuarioMapper.toCategoriaUsuarioDTO(
+                categoriaUsuarioRepository.save(
+                        categoriaUsuarioMapper.toCategoriaUsuario(categoriaUsuario)
+                )
+        );
     }
 
     public void deleteCategoriaUsuario(Long idCategoriaUsuario) {

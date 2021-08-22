@@ -1,12 +1,18 @@
 package com.dio.controledepontoeacesso.controller;
 
+import com.dio.controledepontoeacesso.dto.CategoriaUsuarioDTO;
 import com.dio.controledepontoeacesso.exception.NoSuchElementException;
+import com.dio.controledepontoeacesso.exception.NotFoundException;
 import com.dio.controledepontoeacesso.model.CategoriaUsuario;
+import com.dio.controledepontoeacesso.response.CategoriaUsuarioResponse;
+import com.dio.controledepontoeacesso.response.OcorrenciaResponse;
 import com.dio.controledepontoeacesso.service.CategoriaUsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -19,49 +25,48 @@ public class CategoriaUsuarioController {
     CategoriaUsuarioService categoriaUsuarioService;
 
     @PostMapping
-    public CategoriaUsuario createCategoriaUsuario(@Valid @RequestBody CategoriaUsuario categoriaUsuario){
-        return categoriaUsuarioService.saveCategoriaUsuario(categoriaUsuario);
+    public ResponseEntity<CategoriaUsuarioDTO> createCategoriaUsuario(@Valid @RequestBody CategoriaUsuarioDTO categoriaUsuario){
+        return ResponseEntity.ok(categoriaUsuarioService.saveCategoriaUsuario(categoriaUsuario));
     }
 
     @GetMapping
-    public List<CategoriaUsuario> getCategoriaUsuarioList(){
-        return categoriaUsuarioService.findAll();
+    public ResponseEntity<List<CategoriaUsuarioDTO>> getCategoriaUsuarioList(){
+        return ResponseEntity.ok(categoriaUsuarioService.findAll());
     }
 
     @GetMapping("/{idCategoriaUsuario}")
-    public ResponseEntity<CategoriaUsuario> getCategoriaUsuarioByID(@PathVariable("idCategoriaUsuario") Long idCategoriaUsuario) {
-        return categoriaUsuarioService.getById(idCategoriaUsuario)
-                .map(categoriaUsuario -> ResponseEntity.ok().body(categoriaUsuario))
-                .orElseGet(() -> ResponseEntity.notFound().build());
+    public ResponseEntity<CategoriaUsuarioDTO> getCategoriaUsuarioByID(@PathVariable("idCategoriaUsuario") Long idCategoriaUsuario) {
+        try {
+            return ResponseEntity.ok(categoriaUsuarioService.getById(idCategoriaUsuario));
+        } catch (NotFoundException e) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, CategoriaUsuarioResponse.ENTITY_NOT_FOUND, e);
+        }
     }
 
-    @PutMapping
-    public ResponseEntity<CategoriaUsuario> updateCategoriaUsuario(@Valid @RequestBody CategoriaUsuario categoriaUsuario){
-        var res = Optional.of(categoriaUsuario.getId());
-
-        if(res.isEmpty() || res.get() <= 0) return ResponseEntity.badRequest().build();
-
+    @PutMapping("/{idCategoriaUsuario}")
+    public ResponseEntity<CategoriaUsuarioDTO> updateCategoriaUsuario(@PathVariable("idCategoriaUsuario") Long idCategoriaUsuario,
+                                                                   @Valid @RequestBody CategoriaUsuarioDTO categoriaUsuario){
         try {
-            return ResponseEntity.ok().body(categoriaUsuarioService.updateCategoriaUsuario(categoriaUsuario));
-        } catch (NoSuchElementException e) {
-            e.printStackTrace();
-            return ResponseEntity.notFound().build();
+            categoriaUsuario.setId(idCategoriaUsuario);
+            return ResponseEntity.ok(categoriaUsuarioService.updateCategoriaUsuario(categoriaUsuario));
+        } catch (NotFoundException e) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, CategoriaUsuarioResponse.ENTITY_NOT_FOUND, e);
         }
     }
 
     @DeleteMapping("/{idCategoriaUsuario}")
     public ResponseEntity deleteByID(@PathVariable("idCategoriaUsuario") Long idCategoriaUsuario) {
-        if(idCategoriaUsuario <= 0) return ResponseEntity.badRequest().build();
-
         try {
             categoriaUsuarioService.deleteCategoriaUsuario(idCategoriaUsuario);
             return ResponseEntity.noContent().build();
         } catch (EmptyResultDataAccessException e){
-            e.printStackTrace();
-            return ResponseEntity.notFound().build();
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, CategoriaUsuarioResponse.ENTITY_NOT_FOUND, e);
         } catch (Exception e){
-            e.printStackTrace();
-            return ResponseEntity.internalServerError().build();
+            throw new ResponseStatusException(
+                    HttpStatus.INTERNAL_SERVER_ERROR, CategoriaUsuarioResponse.INTERNAL_SERVER_ERROR, e);
         }
     }
 }
