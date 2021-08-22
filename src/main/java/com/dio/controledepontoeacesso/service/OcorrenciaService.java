@@ -30,7 +30,7 @@ public class OcorrenciaService {
         return ocorrenciaMapper.toOcorrenciaDTOs(ocorrenciaRepository.findAll());
     }
 
-    public OcorrenciaDTO getById(Long idOcorrencia) {
+    public OcorrenciaDTO getById(Long idOcorrencia) throws NotFoundException {
         return ocorrenciaRepository.findById(idOcorrencia)
                 .map(ocorrenciaMapper::toOcorrenciaDTO)
                 .orElseThrow(() -> new NotFoundException(OcorrenciaResponse.ENTITY_NOT_FOUND));

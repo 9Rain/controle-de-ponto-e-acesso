@@ -1,43 +1,53 @@
 package com.dio.controledepontoeacesso.service;
 
-import com.dio.controledepontoeacesso.exception.NoSuchElementException;
-import com.dio.controledepontoeacesso.model.TipoData;
+import com.dio.controledepontoeacesso.dto.TipoDataDTO;
+import com.dio.controledepontoeacesso.exception.NotFoundException;
+import com.dio.controledepontoeacesso.mapper.TipoDataMapper;
 import com.dio.controledepontoeacesso.repository.TipoDataRepository;
+import com.dio.controledepontoeacesso.response.TipoDataResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class TipoDataService {
+    @Autowired
     TipoDataRepository tipoDataRepository;
 
     @Autowired
-    public TipoDataService(TipoDataRepository tipoDataRepository) {
-        this.tipoDataRepository = tipoDataRepository;
+    TipoDataMapper tipoDataMapper;
+
+    public TipoDataDTO saveTipoData(TipoDataDTO tipoData){
+        return tipoDataMapper.toTipoDataDTO(
+                tipoDataRepository.save(
+                        tipoDataMapper.toTipoData(tipoData)
+                )
+        );
     }
 
-    public TipoData saveTipoData(TipoData tipoData){
-        return tipoDataRepository.save(tipoData);
+    public List<TipoDataDTO> findAll() {
+        return tipoDataMapper.toTipoDataDTOs(tipoDataRepository.findAll());
     }
 
-    public List<TipoData> findAll() {
-        return tipoDataRepository.findAll();
+    public TipoDataDTO getById(Long idTipoData) throws NotFoundException {
+        return tipoDataRepository.findById(idTipoData)
+                .map(tipoDataMapper::toTipoDataDTO)
+                .orElseThrow(() -> new NotFoundException(TipoDataResponse.ENTITY_NOT_FOUND));
     }
 
-    public Optional<TipoData> getById(Long idTipoData) {
-        return tipoDataRepository.findById(idTipoData);
-    }
-
-    public TipoData updateTipoData(TipoData tipoData) throws NoSuchElementException {
-        var tipoDataToBeUpdated = this.getById(tipoData.getId());
+    public TipoDataDTO updateTipoData(TipoDataDTO tipoData) throws NotFoundException {
+        var tipoDataToBeUpdated = tipoDataRepository.findById(tipoData.getId());
 
         if(tipoDataToBeUpdated.isEmpty()) {
-            throw new NoSuchElementException();
+            throw new NotFoundException(TipoDataResponse.ENTITY_NOT_FOUND);
         }
 
-        return tipoDataRepository.save(tipoData);
+        return tipoDataMapper.toTipoDataDTO(
+                tipoDataRepository.save(
+                        tipoDataMapper.toTipoData(tipoData)
+                )
+        );
     }
 
     public void deleteTipoData(Long idTipoData) {

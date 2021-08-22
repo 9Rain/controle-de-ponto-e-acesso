@@ -2,6 +2,7 @@ package com.dio.controledepontoeacesso.service;
 
 import com.dio.controledepontoeacesso.exception.NoSuchElementException;
 import com.dio.controledepontoeacesso.exception.RelationshipNotFoundException;
+import com.dio.controledepontoeacesso.mapper.TipoDataMapper;
 import com.dio.controledepontoeacesso.model.Calendario;
 import com.dio.controledepontoeacesso.repository.CalendarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,23 +13,25 @@ import java.util.Optional;
 
 @Service
 public class CalendarioService {
+    @Autowired
     CalendarioRepository calendarioRepository;
+
+    @Autowired
     TipoDataService tipoDataService;
 
     @Autowired
-    public CalendarioService(CalendarioRepository calendarioRepository, TipoDataService tipoDataService) {
-        this.calendarioRepository = calendarioRepository;
-        this.tipoDataService = tipoDataService;
-    }
+    TipoDataMapper tipoDataMapper;
 
-    public Calendario saveCalendario(Calendario calendario) throws RelationshipNotFoundException {
+
+    public Calendario saveCalendario(Calendario calendario) {
         var relatedTipoData = tipoDataService.getById(calendario.getTipoDataId());
 
-        if(relatedTipoData.isEmpty()) {
-            throw new RelationshipNotFoundException();
-        }
+//        if(relatedTipoData.isEmpty()) {
+//            throw new RelationshipNotFoundException();
+//        }
 
-        calendario.setTipoData(relatedTipoData.get());
+        calendario.setTipoData(tipoDataMapper.toTipoData(relatedTipoData));
+//        calendario.setTipoData(relatedTipoData.get());
 
         return calendarioRepository.save(calendario);
     }
@@ -41,7 +44,7 @@ public class CalendarioService {
         return calendarioRepository.findById(idCalendario);
     }
 
-    public Calendario updateCalendario(Calendario calendario) throws NoSuchElementException, RelationshipNotFoundException {
+    public Calendario updateCalendario(Calendario calendario) throws NoSuchElementException {
         var calendarioToBeUpdated = this.getById(calendario.getId());
 
         if(calendarioToBeUpdated.isEmpty()) {
@@ -50,11 +53,12 @@ public class CalendarioService {
 
         var relatedTipoData = tipoDataService.getById(calendario.getTipoDataId());
 
-        if(relatedTipoData.isEmpty()) {
-            throw new RelationshipNotFoundException();
-        }
+//        if(relatedTipoData.isEmpty()) {
+//            throw new RelationshipNotFoundException();
+//        }
 
-        calendario.setTipoData(relatedTipoData.get());
+//        calendario.setTipoData(relatedTipoData.get());
+        calendario.setTipoData(tipoDataMapper.toTipoData(relatedTipoData));
 
         return calendarioRepository.save(calendario);
     }
