@@ -29,10 +29,16 @@ public class CalendarioDTO {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy HH:mm:ss")
     private LocalDateTime dataEspecial;
 
+    @NotNull
+    @Getter
+    @Setter
+    private TipoData tipoData;
+
     public CalendarioDTO(Long id, TipoData tipoData, String descricao, LocalDateTime dataEspecial) {
         this.id = id;
         this.setDescricao(descricao);
         this.dataEspecial = dataEspecial;
+        this.tipoData = tipoData;
     }
 
     public String getDescricao() {

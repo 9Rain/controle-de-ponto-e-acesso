@@ -22,4 +22,7 @@ public class Calendario {
     private String descricao;
 
     private LocalDateTime dataEspecial;
+
+    @ManyToOne(optional = false)
+    private TipoData tipoData;
 }

@@ -4,6 +4,7 @@ import com.dio.controledepontoeacesso.dto.CalendarioDTO;
 import com.dio.controledepontoeacesso.exception.NotFoundException;
 import com.dio.controledepontoeacesso.mapper.CalendarioMapper;
 import com.dio.controledepontoeacesso.repository.CalendarioRepository;
+import com.dio.controledepontoeacesso.repository.TipoDataRepository;
 import com.dio.controledepontoeacesso.response.CalendarioResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,15 +17,24 @@ public class CalendarioService {
     CalendarioRepository calendarioRepository;
 
     @Autowired
+    TipoDataRepository tipoDataRepository;
+
+    @Autowired
     CalendarioMapper calendarioMapper;
 
 
-    public CalendarioDTO saveCalendario(CalendarioDTO calendario) {
-        return calendarioMapper.toCalendarioDTO(
-                calendarioRepository.save(
+    public CalendarioDTO saveCalendario(CalendarioDTO calendario) throws NotFoundException {
+        return tipoDataRepository.findById(calendario.getTipoData().getId())
+            .map((tipoData) -> {
+                calendario.setTipoData(tipoData);
+
+                return calendarioMapper.toCalendarioDTO(
+                    calendarioRepository.save(
                         calendarioMapper.toCalendario(calendario)
-                )
-        );
+                    )
+                );
+            })
+            .orElseThrow(() -> new NotFoundException(CalendarioResponse.TIPO_DATA_NOT_FOUND));
     }
 
     public List<CalendarioDTO> findAll() {
@@ -38,17 +48,21 @@ public class CalendarioService {
     }
 
     public CalendarioDTO updateCalendario(CalendarioDTO calendario) throws NotFoundException {
-        var calendarioToBeUpdated = calendarioRepository.findById(calendario.getId());
+        return calendarioRepository.findById(calendario.getId())
+            .map((calendarioToBeUpdated) ->
+                tipoDataRepository.findById(calendario.getTipoData().getId())
+                    .map((tipoData) -> {
+                        calendario.setTipoData(tipoData);
 
-        if(calendarioToBeUpdated.isEmpty()) {
-            throw new NotFoundException(CalendarioResponse.ENTITY_NOT_FOUND);
-        }
-
-        return calendarioMapper.toCalendarioDTO(
-                calendarioRepository.save(
-                        calendarioMapper.toCalendario(calendario)
-                )
-        );
+                        return calendarioMapper.toCalendarioDTO(
+                                calendarioRepository.save(
+                                        calendarioMapper.toCalendario(calendario)
+                                )
+                        );
+                    })
+                    .orElseThrow(() -> new NotFoundException(CalendarioResponse.TIPO_DATA_NOT_FOUND))
+            )
+            .orElseThrow(() -> new NotFoundException(CalendarioResponse.ENTITY_NOT_FOUND));
     }
 
     public void deleteCalendario(Long idCalendario) {

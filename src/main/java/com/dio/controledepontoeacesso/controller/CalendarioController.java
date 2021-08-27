@@ -27,12 +27,32 @@ public class CalendarioController {
 
     @PostMapping
     public ResponseEntity<CalendarioDTO> createCalendario(@Valid @RequestBody CalendarioDTO calendar){
-        return ResponseEntity.status(HttpStatus.CREATED).body(calendarioService.saveCalendario(calendar));
+        var tipoDataId = Optional.ofNullable(calendar.getTipoData().getId());
+
+        if(tipoDataId.isEmpty()) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, CalendarioResponse.TIPO_DATA_IS_REQUIRED, new NullPointerException());
+        }
+
+        try {
+            return ResponseEntity.status(HttpStatus.CREATED).body(calendarioService.saveCalendario(calendar));
+        } catch (NotFoundException e) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, e.getMessage(), e);
+        } catch (Exception e){
+            throw new ResponseStatusException(
+                    HttpStatus.INTERNAL_SERVER_ERROR, CalendarioResponse.INTERNAL_SERVER_ERROR, e);
+        }
     }
 
     @GetMapping
     public ResponseEntity<List<CalendarioDTO>> getCalendarioList(){
-        return ResponseEntity.ok(calendarioService.findAll());
+        try {
+            return ResponseEntity.ok(calendarioService.findAll());
+        } catch (Exception e){
+            throw new ResponseStatusException(
+                    HttpStatus.INTERNAL_SERVER_ERROR, CalendarioResponse.INTERNAL_SERVER_ERROR, e);
+        }
     }
 
     @GetMapping("/{calendarId}")
@@ -41,19 +61,32 @@ public class CalendarioController {
             return ResponseEntity.ok(calendarioService.getById(calendarId));
         } catch (NotFoundException e) {
             throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, CalendarioResponse.ENTITY_NOT_FOUND, e);
+                    HttpStatus.NOT_FOUND, e.getMessage(), e);
+        } catch (Exception e){
+            throw new ResponseStatusException(
+                    HttpStatus.INTERNAL_SERVER_ERROR, CalendarioResponse.INTERNAL_SERVER_ERROR, e);
         }
     }
 
     @PutMapping("/{calendarId}")
     public ResponseEntity<CalendarioDTO> updateDateType(@PathVariable("calendarId") Long calendarId,
                                                      @Valid @RequestBody CalendarioDTO calendar){
+        var tipoDataId = Optional.ofNullable(calendar.getTipoData().getId());
+
+        if(tipoDataId.isEmpty()) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, CalendarioResponse.TIPO_DATA_IS_REQUIRED, new NullPointerException());
+        }
+
         try {
             calendar.setId(calendarId);
             return ResponseEntity.ok(calendarioService.updateCalendario(calendar));
         } catch (NotFoundException e) {
             throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, CalendarioResponse.ENTITY_NOT_FOUND, e);
+                    HttpStatus.NOT_FOUND, e.getMessage(), e);
+        } catch (Exception e){
+            throw new ResponseStatusException(
+                    HttpStatus.INTERNAL_SERVER_ERROR, CalendarioResponse.INTERNAL_SERVER_ERROR, e);
         }
     }
 

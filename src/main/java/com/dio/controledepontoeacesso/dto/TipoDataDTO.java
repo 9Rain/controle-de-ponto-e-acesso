@@ -13,14 +13,14 @@ import javax.validation.constraints.Size;
 public class TipoDataDTO {
     @Getter
     @Setter
-    private long id;
+    private Long id;
 
     @NotNull
     @NotBlank
     @Size(min = 1, max = 400)
     private String descricao;
 
-    public TipoDataDTO(long id, String descricao) {
+    public TipoDataDTO(Long id, String descricao) {
         this.id = id;
         this.setDescricao(descricao);
     }
