@@ -6,6 +6,7 @@ import com.dio.controledepontoeacesso.mapper.CalendarioMapper;
 import com.dio.controledepontoeacesso.repository.CalendarioRepository;
 import com.dio.controledepontoeacesso.repository.TipoDataRepository;
 import com.dio.controledepontoeacesso.response.CalendarioResponse;
+import com.dio.controledepontoeacesso.response.TipoDataResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -67,5 +68,11 @@ public class CalendarioService {
 
     public void deleteCalendario(Long idCalendario) {
         calendarioRepository.deleteById(idCalendario);
+    }
+
+    public List<CalendarioDTO> findByTipoDataId(Long dateTypeId) throws NotFoundException {
+        return tipoDataRepository.findById(dateTypeId)
+            .map((tipoData) -> calendarioMapper.toCalendarioDTOs(calendarioRepository.findByTipoDataId(dateTypeId)))
+            .orElseThrow(() -> new NotFoundException(CalendarioResponse.TIPO_DATA_NOT_FOUND));
     }
 }

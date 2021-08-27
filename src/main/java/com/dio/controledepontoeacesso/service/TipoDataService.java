@@ -3,6 +3,7 @@ package com.dio.controledepontoeacesso.service;
 import com.dio.controledepontoeacesso.dto.TipoDataDTO;
 import com.dio.controledepontoeacesso.exception.NotFoundException;
 import com.dio.controledepontoeacesso.mapper.TipoDataMapper;
+import com.dio.controledepontoeacesso.repository.CalendarioRepository;
 import com.dio.controledepontoeacesso.repository.TipoDataRepository;
 import com.dio.controledepontoeacesso.response.TipoDataResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,9 @@ import java.util.List;
 public class TipoDataService {
     @Autowired
     TipoDataRepository tipoDataRepository;
+
+    @Autowired
+    CalendarioRepository calendarioRepository;
 
     @Autowired
     TipoDataMapper tipoDataMapper;
@@ -37,20 +41,19 @@ public class TipoDataService {
     }
 
     public TipoDataDTO updateTipoData(TipoDataDTO tipoData) throws NotFoundException {
-        var tipoDataToBeUpdated = tipoDataRepository.findById(tipoData.getId());
-
-        if(tipoDataToBeUpdated.isEmpty()) {
-            throw new NotFoundException(TipoDataResponse.ENTITY_NOT_FOUND);
-        }
-
-        return tipoDataMapper.toTipoDataDTO(
-                tipoDataRepository.save(
-                        tipoDataMapper.toTipoData(tipoData)
+        return tipoDataRepository.findById(tipoData.getId())
+            .map((tipoDataToBeUpdated) ->
+                tipoDataMapper.toTipoDataDTO(
+                    tipoDataRepository.save(
+                            tipoDataMapper.toTipoData(tipoData)
+                    )
                 )
-        );
+            )
+            .orElseThrow(() -> new NotFoundException(TipoDataResponse.ENTITY_NOT_FOUND));
     }
 
     public void deleteTipoData(Long idTipoData) {
+        calendarioRepository.deleteByTipoDataId(idTipoData);
         tipoDataRepository.deleteById(idTipoData);
     }
 }

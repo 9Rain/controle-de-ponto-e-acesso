@@ -1,8 +1,10 @@
 package com.dio.controledepontoeacesso.controller;
 
+import com.dio.controledepontoeacesso.dto.CalendarioDTO;
 import com.dio.controledepontoeacesso.dto.TipoDataDTO;
 import com.dio.controledepontoeacesso.exception.NotFoundException;
 import com.dio.controledepontoeacesso.response.TipoDataResponse;
+import com.dio.controledepontoeacesso.service.CalendarioService;
 import com.dio.controledepontoeacesso.service.TipoDataService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -20,14 +22,28 @@ public class TipoDataController {
     @Autowired
     TipoDataService tipoDataService;
 
+    @Autowired
+    CalendarioService calendarioService;
+
+
     @PostMapping
     public ResponseEntity<TipoDataDTO> createTipoData(@Valid @RequestBody TipoDataDTO dateType){
-        return ResponseEntity.status(HttpStatus.CREATED).body(tipoDataService.saveTipoData(dateType));
+        try {
+            return ResponseEntity.status(HttpStatus.CREATED).body(tipoDataService.saveTipoData(dateType));
+        } catch (Exception e){
+            throw new ResponseStatusException(
+                    HttpStatus.INTERNAL_SERVER_ERROR, TipoDataResponse.INTERNAL_SERVER_ERROR, e);
+        }
     }
 
     @GetMapping
     public ResponseEntity<List<TipoDataDTO>> getTipoDataList(){
-        return ResponseEntity.ok(tipoDataService.findAll());
+        try {
+            return ResponseEntity.ok(tipoDataService.findAll());
+        } catch (Exception e){
+            throw new ResponseStatusException(
+                    HttpStatus.INTERNAL_SERVER_ERROR, TipoDataResponse.INTERNAL_SERVER_ERROR, e);
+        }
     }
 
     @GetMapping("/{dateTypeId}")
@@ -36,7 +52,10 @@ public class TipoDataController {
             return ResponseEntity.ok(tipoDataService.getById(dateTypeId));
         } catch (NotFoundException e) {
             throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, TipoDataResponse.ENTITY_NOT_FOUND, e);
+                    HttpStatus.NOT_FOUND, e.getMessage(), e);
+        } catch (Exception e){
+            throw new ResponseStatusException(
+                    HttpStatus.INTERNAL_SERVER_ERROR, TipoDataResponse.INTERNAL_SERVER_ERROR, e);
         }
     }
 
@@ -48,7 +67,10 @@ public class TipoDataController {
             return ResponseEntity.ok(tipoDataService.updateTipoData(dateType));
         } catch (NotFoundException e) {
             throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, TipoDataResponse.ENTITY_NOT_FOUND, e);
+                    HttpStatus.NOT_FOUND, e.getMessage(), e);
+        } catch (Exception e){
+            throw new ResponseStatusException(
+                    HttpStatus.INTERNAL_SERVER_ERROR, TipoDataResponse.INTERNAL_SERVER_ERROR, e);
         }
     }
 
@@ -60,6 +82,19 @@ public class TipoDataController {
         } catch (EmptyResultDataAccessException e){
             throw new ResponseStatusException(
                     HttpStatus.NOT_FOUND, TipoDataResponse.ENTITY_NOT_FOUND, e);
+        } catch (Exception e){
+            throw new ResponseStatusException(
+                    HttpStatus.INTERNAL_SERVER_ERROR, TipoDataResponse.INTERNAL_SERVER_ERROR, e);
+        }
+    }
+
+    @GetMapping("/{dateTypeId}/calendars")
+    public ResponseEntity<List<CalendarioDTO>> listTipoDataCalendars(@PathVariable("dateTypeId") Long dateTypeId) {
+        try {
+            return ResponseEntity.ok(calendarioService.findByTipoDataId(dateTypeId));
+        } catch (NotFoundException e) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, e.getMessage(), e);
         } catch (Exception e){
             throw new ResponseStatusException(
                     HttpStatus.INTERNAL_SERVER_ERROR, TipoDataResponse.INTERNAL_SERVER_ERROR, e);

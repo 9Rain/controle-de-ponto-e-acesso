@@ -1,10 +1,13 @@
 package com.dio.controledepontoeacesso.dto;
 
+import com.dio.controledepontoeacesso.model.Calendario;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.List;
 
 @NoArgsConstructor
 @EqualsAndHashCode
