@@ -3,6 +3,7 @@ package com.dio.controledepontoeacesso.service;
 import com.dio.controledepontoeacesso.dto.UsuarioDTO;
 import com.dio.controledepontoeacesso.exception.NotFoundException;
 import com.dio.controledepontoeacesso.mapper.UsuarioMapper;
+import com.dio.controledepontoeacesso.repository.CategoriaUsuarioRepository;
 import com.dio.controledepontoeacesso.repository.JornadaTrabalhoRepository;
 import com.dio.controledepontoeacesso.repository.UsuarioRepository;
 import com.dio.controledepontoeacesso.response.UsuarioResponse;
@@ -20,6 +21,9 @@ public class UsuarioService {
     JornadaTrabalhoRepository jornadaTrabalhoRepository;
 
     @Autowired
+    CategoriaUsuarioRepository categoriaUsuarioRepository;
+
+    @Autowired
     UsuarioMapper usuarioMapper;
 
     public UsuarioDTO saveUsuario(UsuarioDTO usuario) throws NotFoundException {
@@ -27,11 +31,17 @@ public class UsuarioService {
             .map((jornadaTrabalho) -> {
                 usuario.setJornadaTrabalho(jornadaTrabalho);
 
-                return usuarioMapper.toUsuarioDTO(
-                    usuarioRepository.save(
-                        usuarioMapper.toUsuario(usuario)
-                    )
-                );
+                return categoriaUsuarioRepository.findById(usuario.getCategoriaUsuario().getId())
+                    .map((categoriaUsuario) -> {
+                        usuario.setCategoriaUsuario(categoriaUsuario);
+
+                        return usuarioMapper.toUsuarioDTO(
+                                usuarioRepository.save(
+                                        usuarioMapper.toUsuario(usuario)
+                                )
+                        );
+                    })
+                    .orElseThrow(() -> new NotFoundException(UsuarioResponse.CATEGORIA_USUARIO_NOT_FOUND));
             })
             .orElseThrow(() -> new NotFoundException(UsuarioResponse.JORNADA_TRABALHO_NOT_FOUND));
     }
@@ -53,11 +63,17 @@ public class UsuarioService {
                     .map((jornadaTrabalho) -> {
                         usuario.setJornadaTrabalho(jornadaTrabalho);
 
-                        return usuarioMapper.toUsuarioDTO(
-                            usuarioRepository.save(
-                                usuarioMapper.toUsuario(usuario)
-                            )
-                        );
+                        return categoriaUsuarioRepository.findById(usuario.getCategoriaUsuario().getId())
+                            .map((categoriaUsuario) -> {
+                                usuario.setCategoriaUsuario(categoriaUsuario);
+
+                                return usuarioMapper.toUsuarioDTO(
+                                    usuarioRepository.save(
+                                        usuarioMapper.toUsuario(usuario)
+                                    )
+                                );
+                            })
+                            .orElseThrow(() -> new NotFoundException(UsuarioResponse.CATEGORIA_USUARIO_NOT_FOUND));
                     })
                     .orElseThrow(() -> new NotFoundException(UsuarioResponse.JORNADA_TRABALHO_NOT_FOUND))
             )
@@ -72,5 +88,11 @@ public class UsuarioService {
         return jornadaTrabalhoRepository.findById(workingDayId)
             .map((jornadaTrabalho) -> usuarioMapper.toUsuarioDTOs(usuarioRepository.findByJornadaTrabalhoId(workingDayId)))
             .orElseThrow(() -> new NotFoundException(UsuarioResponse.JORNADA_TRABALHO_NOT_FOUND));
+    }
+
+    public List<UsuarioDTO> findByCategoriaUsuarioId(Long userCategoryId) throws NotFoundException {
+        return categoriaUsuarioRepository.findById(userCategoryId)
+            .map((categoriaUsuario) -> usuarioMapper.toUsuarioDTOs(usuarioRepository.findByCategoriaUsuarioId(userCategoryId)))
+            .orElseThrow(() -> new NotFoundException(UsuarioResponse.CATEGORIA_USUARIO_NOT_FOUND));
     }
 }

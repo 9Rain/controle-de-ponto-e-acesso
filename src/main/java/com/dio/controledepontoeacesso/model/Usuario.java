@@ -30,4 +30,7 @@ public class Usuario {
 
     @ManyToOne(optional = false)
     private JornadaTrabalho jornadaTrabalho;
+
+    @ManyToOne(optional = false)
+    private CategoriaUsuario categoriaUsuario;
 }

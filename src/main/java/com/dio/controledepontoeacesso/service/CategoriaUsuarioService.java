@@ -6,6 +6,7 @@ import com.dio.controledepontoeacesso.exception.NotFoundException;
 import com.dio.controledepontoeacesso.mapper.CategoriaUsuarioMapper;
 import com.dio.controledepontoeacesso.model.CategoriaUsuario;
 import com.dio.controledepontoeacesso.repository.CategoriaUsuarioRepository;
+import com.dio.controledepontoeacesso.repository.UsuarioRepository;
 import com.dio.controledepontoeacesso.response.CategoriaUsuarioResponse;
 import com.dio.controledepontoeacesso.response.OcorrenciaResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,9 @@ import java.util.Optional;
 public class CategoriaUsuarioService {
     @Autowired
     CategoriaUsuarioRepository categoriaUsuarioRepository;
+
+    @Autowired
+    UsuarioRepository usuarioRepository;
 
     @Autowired
     CategoriaUsuarioMapper categoriaUsuarioMapper;
@@ -55,6 +59,7 @@ public class CategoriaUsuarioService {
     }
 
     public void deleteCategoriaUsuario(Long idCategoriaUsuario) {
+        usuarioRepository.deleteByCategoriaUsuarioId(idCategoriaUsuario);
         categoriaUsuarioRepository.deleteById(idCategoriaUsuario);
     }
 }

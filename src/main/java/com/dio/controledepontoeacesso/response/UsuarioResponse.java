@@ -11,4 +11,8 @@ public class UsuarioResponse extends Response {
     public static final String JORNADA_TRABALHO_NOT_FOUND = JornadaTrabalhoResponse.ENTITY_NOT_FOUND;
 
     public static final String JORNADA_TRABALHO_IS_REQUIRED = JornadaTrabalhoResponse.ENTITY_IS_REQUIRED;
+
+    public static final String CATEGORIA_USUARIO_NOT_FOUND = CategoriaUsuarioResponse.ENTITY_NOT_FOUND;
+
+    public static final String CATEGORIA_USUARIO_IS_REQUIRED = CategoriaUsuarioResponse.ENTITY_IS_REQUIRED;
 }

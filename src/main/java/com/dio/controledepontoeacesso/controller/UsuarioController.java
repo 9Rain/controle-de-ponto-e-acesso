@@ -2,7 +2,6 @@ package com.dio.controledepontoeacesso.controller;
 
 import com.dio.controledepontoeacesso.dto.UsuarioDTO;
 import com.dio.controledepontoeacesso.exception.NotFoundException;
-import com.dio.controledepontoeacesso.response.LocalidadeResponse;
 import com.dio.controledepontoeacesso.response.UsuarioResponse;
 import com.dio.controledepontoeacesso.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +28,12 @@ public class UsuarioController {
         if(jornadaTrabalhoId.isEmpty())
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST, UsuarioResponse.JORNADA_TRABALHO_IS_REQUIRED, new NullPointerException());
+
+        var categoriaUsuarioId = Optional.ofNullable(user.getCategoriaUsuario().getId());
+
+        if(categoriaUsuarioId.isEmpty())
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, UsuarioResponse.CATEGORIA_USUARIO_IS_REQUIRED, new NullPointerException());
 
         try {
             return ResponseEntity.status(HttpStatus.CREATED).body(usuarioService.saveUsuario(user));
@@ -72,6 +77,12 @@ public class UsuarioController {
         if(jornadaTrabalhoId.isEmpty())
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST, UsuarioResponse.JORNADA_TRABALHO_IS_REQUIRED, new NullPointerException());
+
+        var categoriaUsuarioId = Optional.ofNullable(user.getCategoriaUsuario().getId());
+
+        if(categoriaUsuarioId.isEmpty())
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, UsuarioResponse.CATEGORIA_USUARIO_IS_REQUIRED, new NullPointerException());
 
         try {
             user.setId(userId);
