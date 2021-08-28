@@ -4,6 +4,7 @@ import com.dio.controledepontoeacesso.dto.TipoDataDTO;
 import com.dio.controledepontoeacesso.exception.NotFoundException;
 import com.dio.controledepontoeacesso.mapper.TipoDataMapper;
 import com.dio.controledepontoeacesso.repository.CalendarioRepository;
+import com.dio.controledepontoeacesso.repository.MovimentacaoRepository;
 import com.dio.controledepontoeacesso.repository.TipoDataRepository;
 import com.dio.controledepontoeacesso.response.TipoDataResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,9 @@ public class TipoDataService {
 
     @Autowired
     CalendarioRepository calendarioRepository;
+
+    @Autowired
+    MovimentacaoRepository movimentacaoRepository;
 
     @Autowired
     TipoDataMapper tipoDataMapper;
@@ -53,6 +57,7 @@ public class TipoDataService {
     }
 
     public void deleteTipoData(Long idTipoData) {
+        movimentacaoRepository.deleteByTipoDataId(idTipoData);
         calendarioRepository.deleteByTipoDataId(idTipoData);
         tipoDataRepository.deleteById(idTipoData);
     }

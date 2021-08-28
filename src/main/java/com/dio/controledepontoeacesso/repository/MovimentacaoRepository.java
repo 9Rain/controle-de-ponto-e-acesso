@@ -17,6 +17,11 @@ public interface MovimentacaoRepository extends JpaRepository<Movimentacao, Long
     @Query("DELETE Movimentacao M WHERE M.calendario.id = :calendarioId")
     void deleteByCalendarioId(@Param("calendarioId") Long calendarioId);
 
+    @Transactional
+    @Modifying
+    @Query("DELETE Movimentacao M WHERE M.calendario IN (SELECT C FROM Calendario C WHERE C.tipoData.id = :tipoDataId)")
+    void deleteByTipoDataId(@Param("tipoDataId") Long tipoDataId);
+
     @Query(value = "SELECT M FROM Movimentacao M WHERE M.calendario.id = :calendarioId")
     List<Movimentacao> findByCalendarioId(@Param("calendarioId") Long calendarioId);
 }

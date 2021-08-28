@@ -1,13 +1,11 @@
 package com.dio.controledepontoeacesso.controller;
 
 import com.dio.controledepontoeacesso.dto.CalendarioDTO;
-import com.dio.controledepontoeacesso.exception.NoSuchElementException;
+import com.dio.controledepontoeacesso.dto.MovimentacaoDTO;
 import com.dio.controledepontoeacesso.exception.NotFoundException;
-import com.dio.controledepontoeacesso.exception.RelationshipNotFoundException;
-import com.dio.controledepontoeacesso.model.Calendario;
 import com.dio.controledepontoeacesso.response.CalendarioResponse;
-import com.dio.controledepontoeacesso.response.TipoDataResponse;
 import com.dio.controledepontoeacesso.service.CalendarioService;
+import com.dio.controledepontoeacesso.service.MovimentacaoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
@@ -24,6 +22,9 @@ import java.util.Optional;
 public class CalendarioController {
     @Autowired
     CalendarioService calendarioService;
+
+    @Autowired
+    MovimentacaoService movimentacaoService;
 
     @PostMapping
     public ResponseEntity<CalendarioDTO> createCalendario(@Valid @RequestBody CalendarioDTO calendar){
@@ -98,6 +99,19 @@ public class CalendarioController {
         } catch (EmptyResultDataAccessException e){
             throw new ResponseStatusException(
                     HttpStatus.NOT_FOUND, CalendarioResponse.ENTITY_NOT_FOUND, e);
+        } catch (Exception e){
+            throw new ResponseStatusException(
+                    HttpStatus.INTERNAL_SERVER_ERROR, CalendarioResponse.INTERNAL_SERVER_ERROR, e);
+        }
+    }
+
+    @GetMapping("/{calendarioId}/movements")
+    public ResponseEntity<List<MovimentacaoDTO>> listNivelAcessoLocalidades(@PathVariable("calendarioId") Long calendarioId) {
+        try {
+            return ResponseEntity.ok(movimentacaoService.findByCalendarioId(calendarioId));
+        } catch (NotFoundException e) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, e.getMessage(), e);
         } catch (Exception e){
             throw new ResponseStatusException(
                     HttpStatus.INTERNAL_SERVER_ERROR, CalendarioResponse.INTERNAL_SERVER_ERROR, e);

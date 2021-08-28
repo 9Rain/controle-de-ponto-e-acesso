@@ -4,6 +4,7 @@ import com.dio.controledepontoeacesso.dto.CalendarioDTO;
 import com.dio.controledepontoeacesso.exception.NotFoundException;
 import com.dio.controledepontoeacesso.mapper.CalendarioMapper;
 import com.dio.controledepontoeacesso.repository.CalendarioRepository;
+import com.dio.controledepontoeacesso.repository.MovimentacaoRepository;
 import com.dio.controledepontoeacesso.repository.TipoDataRepository;
 import com.dio.controledepontoeacesso.response.CalendarioResponse;
 import com.dio.controledepontoeacesso.response.TipoDataResponse;
@@ -19,6 +20,9 @@ public class CalendarioService {
 
     @Autowired
     TipoDataRepository tipoDataRepository;
+
+    @Autowired
+    MovimentacaoRepository movimentacaoRepository;
 
     @Autowired
     CalendarioMapper calendarioMapper;
@@ -67,6 +71,7 @@ public class CalendarioService {
     }
 
     public void deleteCalendario(Long idCalendario) {
+        movimentacaoRepository.deleteByCalendarioId(idCalendario);
         calendarioRepository.deleteById(idCalendario);
     }
 
