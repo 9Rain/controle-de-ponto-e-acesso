@@ -3,6 +3,7 @@ package com.dio.controledepontoeacesso.service;
 import com.dio.controledepontoeacesso.dto.NivelAcessoDTO;
 import com.dio.controledepontoeacesso.exception.NotFoundException;
 import com.dio.controledepontoeacesso.mapper.NivelAcessoMapper;
+import com.dio.controledepontoeacesso.repository.LocalidadeRepository;
 import com.dio.controledepontoeacesso.repository.NivelAcessoRepository;
 import com.dio.controledepontoeacesso.response.NivelAcessoResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,13 +18,16 @@ public class NivelAcessoService {
     NivelAcessoRepository nivelAcessoRepository;
 
     @Autowired
+    LocalidadeRepository localidadeRepository;
+
+    @Autowired
     NivelAcessoMapper nivelAcessoMapper;
 
     public NivelAcessoDTO saveNivelAcesso(NivelAcessoDTO nivelAcesso){
         return nivelAcessoMapper.toNivelAcessoDTO(
-                nivelAcessoRepository.save(
-                        nivelAcessoMapper.toNivelAcesso(nivelAcesso)
-                )
+            nivelAcessoRepository.save(
+                nivelAcessoMapper.toNivelAcesso(nivelAcesso)
+            )
         );
     }
 
@@ -33,8 +37,8 @@ public class NivelAcessoService {
 
     public NivelAcessoDTO getById(Long idNivelAcesso) throws NotFoundException {
         return nivelAcessoRepository.findById(idNivelAcesso)
-                .map(nivelAcessoMapper::toNivelAcessoDTO)
-                .orElseThrow(() -> new NotFoundException(NivelAcessoResponse.ENTITY_NOT_FOUND));
+            .map(nivelAcessoMapper::toNivelAcessoDTO)
+            .orElseThrow(() -> new NotFoundException(NivelAcessoResponse.ENTITY_NOT_FOUND));
     }
 
     public NivelAcessoDTO updateNivelAcesso(NivelAcessoDTO nivelAcesso) throws NotFoundException {
@@ -45,13 +49,14 @@ public class NivelAcessoService {
         }
 
         return nivelAcessoMapper.toNivelAcessoDTO(
-                nivelAcessoRepository.save(
-                        nivelAcessoMapper.toNivelAcesso(nivelAcesso)
-                )
+            nivelAcessoRepository.save(
+                nivelAcessoMapper.toNivelAcesso(nivelAcesso)
+            )
         );
     }
 
     public void deleteNivelAcesso(Long idNivelAcesso) {
+        localidadeRepository.deleteByNivelAcessoId(idNivelAcesso);
         nivelAcessoRepository.deleteById(idNivelAcesso);
     }
 }
