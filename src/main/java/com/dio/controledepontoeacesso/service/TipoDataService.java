@@ -3,6 +3,7 @@ package com.dio.controledepontoeacesso.service;
 import com.dio.controledepontoeacesso.dto.TipoDataDTO;
 import com.dio.controledepontoeacesso.exception.NotFoundException;
 import com.dio.controledepontoeacesso.mapper.TipoDataMapper;
+import com.dio.controledepontoeacesso.repository.BancoHorasRepository;
 import com.dio.controledepontoeacesso.repository.CalendarioRepository;
 import com.dio.controledepontoeacesso.repository.MovimentacaoRepository;
 import com.dio.controledepontoeacesso.repository.TipoDataRepository;
@@ -22,6 +23,9 @@ public class TipoDataService {
 
     @Autowired
     MovimentacaoRepository movimentacaoRepository;
+
+    @Autowired
+    BancoHorasRepository bancoHorasRepository;
 
     @Autowired
     TipoDataMapper tipoDataMapper;
@@ -57,6 +61,7 @@ public class TipoDataService {
     }
 
     public void deleteTipoData(Long idTipoData) {
+        bancoHorasRepository.deleteByTipoDataId(idTipoData);
         movimentacaoRepository.deleteByTipoDataId(idTipoData);
         calendarioRepository.deleteByTipoDataId(idTipoData);
         tipoDataRepository.deleteById(idTipoData);

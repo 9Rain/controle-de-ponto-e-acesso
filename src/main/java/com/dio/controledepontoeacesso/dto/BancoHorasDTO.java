@@ -1,5 +1,6 @@
 package com.dio.controledepontoeacesso.dto;
 
+import com.dio.controledepontoeacesso.model.Movimentacao;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 
@@ -26,4 +27,9 @@ public class BancoHorasDTO {
 
     @NotNull
     private BigDecimal saldoHoras;
+
+    @NotNull
+    @Getter
+    @Setter
+    private Movimentacao movimentacao;
 }

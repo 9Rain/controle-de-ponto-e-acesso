@@ -3,6 +3,7 @@ package com.dio.controledepontoeacesso.service;
 import com.dio.controledepontoeacesso.dto.MovimentacaoDTO;
 import com.dio.controledepontoeacesso.exception.NotFoundException;
 import com.dio.controledepontoeacesso.mapper.MovimentacaoMapper;
+import com.dio.controledepontoeacesso.repository.BancoHorasRepository;
 import com.dio.controledepontoeacesso.repository.CalendarioRepository;
 import com.dio.controledepontoeacesso.repository.MovimentacaoRepository;
 import com.dio.controledepontoeacesso.response.MovimentacaoResponse;
@@ -18,6 +19,9 @@ public class MovimentacaoService {
 
     @Autowired
     CalendarioRepository calendarioRepository;
+
+    @Autowired
+    BancoHorasRepository bancoHorasRepository;
 
     @Autowired
     MovimentacaoMapper movimentacaoMapper;
@@ -65,6 +69,7 @@ public class MovimentacaoService {
     }
 
     public void deleteMovimentacao(Long idMovimentacao) {
+        bancoHorasRepository.deleteByMovimentacaoId(idMovimentacao);
         movimentacaoRepository.deleteById(idMovimentacao);
     }
 

@@ -3,6 +3,7 @@ package com.dio.controledepontoeacesso.controller;
 import com.dio.controledepontoeacesso.dto.BancoHorasDTO;
 import com.dio.controledepontoeacesso.exception.NotFoundException;
 import com.dio.controledepontoeacesso.response.BancoHorasResponse;
+import com.dio.controledepontoeacesso.response.LocalidadeResponse;
 import com.dio.controledepontoeacesso.service.BancoHorasService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -23,12 +24,31 @@ public class BancoHorasController {
 
     @PostMapping
     public ResponseEntity<BancoHorasDTO> createBancoHoras(@Valid @RequestBody BancoHorasDTO additionalHour){
-        return ResponseEntity.status(HttpStatus.CREATED).body(bancoHorasService.saveBancoHoras(additionalHour));
+        var movimentacaoId = Optional.ofNullable(additionalHour.getMovimentacao().getId());
+
+        if(movimentacaoId.isEmpty())
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, BancoHorasResponse.MOVIMENTACAO_IS_REQUIRED, new NullPointerException());
+
+        try {
+            return ResponseEntity.status(HttpStatus.CREATED).body(bancoHorasService.saveBancoHoras(additionalHour));
+        } catch (NotFoundException e) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, e.getMessage(), e);
+        } catch (Exception e){
+            throw new ResponseStatusException(
+                    HttpStatus.INTERNAL_SERVER_ERROR, BancoHorasResponse.INTERNAL_SERVER_ERROR, e);
+        }
     }
 
     @GetMapping
     public ResponseEntity<List<BancoHorasDTO>> getBancoHorasList(){
-        return ResponseEntity.ok(bancoHorasService.findAll());
+        try {
+            return ResponseEntity.ok(bancoHorasService.findAll());
+        } catch (Exception e){
+            throw new ResponseStatusException(
+                    HttpStatus.INTERNAL_SERVER_ERROR, BancoHorasResponse.INTERNAL_SERVER_ERROR, e);
+        }
     }
 
     @GetMapping("/{additionalHourId}")
@@ -37,19 +57,31 @@ public class BancoHorasController {
             return ResponseEntity.ok(bancoHorasService.getById(additionalHourId));
         } catch (NotFoundException e) {
             throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, BancoHorasResponse.ENTITY_NOT_FOUND, e);
+                    HttpStatus.NOT_FOUND, e.getMessage(), e);
+        } catch (Exception e){
+            throw new ResponseStatusException(
+                    HttpStatus.INTERNAL_SERVER_ERROR, BancoHorasResponse.INTERNAL_SERVER_ERROR, e);
         }
     }
 
     @PutMapping("/{additionalHourId}")
     public ResponseEntity<BancoHorasDTO> updateBancoHoras(@PathVariable("additionalHourId") Long additionalHourId,
                                                     @Valid @RequestBody BancoHorasDTO additionalHour){
+        var movimentacaoId = Optional.ofNullable(additionalHour.getMovimentacao().getId());
+
+        if(movimentacaoId.isEmpty())
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, BancoHorasResponse.MOVIMENTACAO_IS_REQUIRED, new NullPointerException());
+
         try {
             additionalHour.setId(additionalHourId);
             return ResponseEntity.ok(bancoHorasService.updateBancoHoras(additionalHour));
         } catch (NotFoundException e) {
             throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, BancoHorasResponse.ENTITY_NOT_FOUND, e);
+                    HttpStatus.NOT_FOUND, e.getMessage(), e);
+        } catch (Exception e){
+            throw new ResponseStatusException(
+                    HttpStatus.INTERNAL_SERVER_ERROR, BancoHorasResponse.INTERNAL_SERVER_ERROR, e);
         }
     }
 
