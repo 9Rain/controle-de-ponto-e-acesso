@@ -19,7 +19,7 @@ import javax.persistence.Id;
 public class JornadaTrabalho {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     private String descricao;
 }

@@ -27,4 +27,7 @@ public class Usuario {
     private LocalDateTime inicioJornada;
 
     private LocalDateTime finalJornada;
+
+    @ManyToOne(optional = false)
+    private JornadaTrabalho jornadaTrabalho;
 }

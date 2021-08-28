@@ -1,9 +1,12 @@
 package com.dio.controledepontoeacesso.controller;
 
 import com.dio.controledepontoeacesso.dto.JornadaTrabalhoDTO;
+import com.dio.controledepontoeacesso.dto.UsuarioDTO;
 import com.dio.controledepontoeacesso.exception.NotFoundException;
 import com.dio.controledepontoeacesso.response.JornadaTrabalhoResponse;
+import com.dio.controledepontoeacesso.response.OcorrenciaResponse;
 import com.dio.controledepontoeacesso.service.JornadaTrabalhoService;
+import com.dio.controledepontoeacesso.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
@@ -20,14 +23,27 @@ public class JornadaTrabalhoController {
     @Autowired
     JornadaTrabalhoService jornadaTrabalhoService;
 
+    @Autowired
+    UsuarioService usuarioService;
+
     @PostMapping
     public ResponseEntity<JornadaTrabalhoDTO> createJornada(@Valid @RequestBody JornadaTrabalhoDTO jornadaTrabalho){
-        return ResponseEntity.status(HttpStatus.CREATED).body(jornadaTrabalhoService.saveJornada(jornadaTrabalho));
+        try {
+            return ResponseEntity.status(HttpStatus.CREATED).body(jornadaTrabalhoService.saveJornada(jornadaTrabalho));
+        } catch (Exception e){
+            throw new ResponseStatusException(
+                    HttpStatus.INTERNAL_SERVER_ERROR, JornadaTrabalhoResponse.INTERNAL_SERVER_ERROR, e);
+        }
     }
 
     @GetMapping
     public ResponseEntity<List<JornadaTrabalhoDTO>> getJornadaList(){
-        return ResponseEntity.ok(jornadaTrabalhoService.findAll());
+        try {
+            return ResponseEntity.ok(jornadaTrabalhoService.findAll());
+        } catch (Exception e){
+            throw new ResponseStatusException(
+                    HttpStatus.INTERNAL_SERVER_ERROR, JornadaTrabalhoResponse.INTERNAL_SERVER_ERROR, e);
+        }
     }
 
     @GetMapping("/{idJornada}")
@@ -36,7 +52,10 @@ public class JornadaTrabalhoController {
             return ResponseEntity.ok(jornadaTrabalhoService.getById(idJornada));
         } catch (NotFoundException e) {
             throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, JornadaTrabalhoResponse.ENTITY_NOT_FOUND, e);
+                    HttpStatus.NOT_FOUND, e.getMessage(), e);
+        } catch (Exception e){
+            throw new ResponseStatusException(
+                    HttpStatus.INTERNAL_SERVER_ERROR, JornadaTrabalhoResponse.INTERNAL_SERVER_ERROR, e);
         }
     }
 
@@ -48,7 +67,10 @@ public class JornadaTrabalhoController {
             return ResponseEntity.ok(jornadaTrabalhoService.updateJornada(jornadaTrabalho));
         } catch (NotFoundException e) {
             throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, JornadaTrabalhoResponse.ENTITY_NOT_FOUND, e);
+                    HttpStatus.NOT_FOUND, e.getMessage(), e);
+        } catch (Exception e){
+            throw new ResponseStatusException(
+                    HttpStatus.INTERNAL_SERVER_ERROR, JornadaTrabalhoResponse.INTERNAL_SERVER_ERROR, e);
         }
     }
 
@@ -63,6 +85,19 @@ public class JornadaTrabalhoController {
         } catch (Exception e){
             throw new ResponseStatusException(
                     HttpStatus.INTERNAL_SERVER_ERROR, JornadaTrabalhoResponse.INTERNAL_SERVER_ERROR, e);
+        }
+    }
+
+    @GetMapping("/{workingDayId}/users")
+    public ResponseEntity<List<UsuarioDTO>> listJornadaTrabalhoUsuarios(@PathVariable("workingDayId") Long workingDayId) {
+        try {
+            return ResponseEntity.ok(usuarioService.findByJornadaTrabalhoId(workingDayId));
+        } catch (NotFoundException e) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, e.getMessage(), e);
+        } catch (Exception e){
+            throw new ResponseStatusException(
+                    HttpStatus.INTERNAL_SERVER_ERROR, OcorrenciaResponse.INTERNAL_SERVER_ERROR, e);
         }
     }
 }

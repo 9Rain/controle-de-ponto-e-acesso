@@ -3,6 +3,7 @@ package com.dio.controledepontoeacesso.service;
 import com.dio.controledepontoeacesso.dto.UsuarioDTO;
 import com.dio.controledepontoeacesso.exception.NotFoundException;
 import com.dio.controledepontoeacesso.mapper.UsuarioMapper;
+import com.dio.controledepontoeacesso.repository.JornadaTrabalhoRepository;
 import com.dio.controledepontoeacesso.repository.UsuarioRepository;
 import com.dio.controledepontoeacesso.response.UsuarioResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,14 +17,23 @@ public class UsuarioService {
     UsuarioRepository usuarioRepository;
 
     @Autowired
+    JornadaTrabalhoRepository jornadaTrabalhoRepository;
+
+    @Autowired
     UsuarioMapper usuarioMapper;
 
-    public UsuarioDTO saveUsuario(UsuarioDTO usuario){
-        return usuarioMapper.toUsuarioDTO(
-                usuarioRepository.save(
+    public UsuarioDTO saveUsuario(UsuarioDTO usuario) throws NotFoundException {
+        return jornadaTrabalhoRepository.findById(usuario.getJornadaTrabalho().getId())
+            .map((jornadaTrabalho) -> {
+                usuario.setJornadaTrabalho(jornadaTrabalho);
+
+                return usuarioMapper.toUsuarioDTO(
+                    usuarioRepository.save(
                         usuarioMapper.toUsuario(usuario)
-                )
-        );
+                    )
+                );
+            })
+            .orElseThrow(() -> new NotFoundException(UsuarioResponse.JORNADA_TRABALHO_NOT_FOUND));
     }
 
     public List<UsuarioDTO> findAll() {
@@ -32,25 +42,35 @@ public class UsuarioService {
 
     public UsuarioDTO getById(Long idUsuario) throws NotFoundException {
         return usuarioRepository.findById(idUsuario)
-                .map(usuarioMapper::toUsuarioDTO)
-                .orElseThrow(() -> new NotFoundException(UsuarioResponse.ENTITY_NOT_FOUND));
+            .map(usuarioMapper::toUsuarioDTO)
+            .orElseThrow(() -> new NotFoundException(UsuarioResponse.ENTITY_NOT_FOUND));
     }
 
     public UsuarioDTO updateUsuario(UsuarioDTO usuario) throws NotFoundException {
-        var usuarioToBeUpdated = usuarioRepository.findById(usuario.getId());
+        return usuarioRepository.findById(usuario.getId())
+            .map((usuarioToBeUpdated) ->
+                jornadaTrabalhoRepository.findById(usuario.getJornadaTrabalho().getId())
+                    .map((jornadaTrabalho) -> {
+                        usuario.setJornadaTrabalho(jornadaTrabalho);
 
-        if(usuarioToBeUpdated.isEmpty()) {
-            throw new NotFoundException(UsuarioResponse.ENTITY_NOT_FOUND);
-        }
-
-        return usuarioMapper.toUsuarioDTO(
-                usuarioRepository.save(
-                        usuarioMapper.toUsuario(usuario)
-                )
-        );
+                        return usuarioMapper.toUsuarioDTO(
+                            usuarioRepository.save(
+                                usuarioMapper.toUsuario(usuario)
+                            )
+                        );
+                    })
+                    .orElseThrow(() -> new NotFoundException(UsuarioResponse.JORNADA_TRABALHO_NOT_FOUND))
+            )
+            .orElseThrow(() -> new NotFoundException(UsuarioResponse.ENTITY_NOT_FOUND));
     }
 
     public void deleteUsuario(Long idUsuario) {
         usuarioRepository.deleteById(idUsuario);
+    }
+
+    public List<UsuarioDTO> findByJornadaTrabalhoId(Long workingDayId) throws NotFoundException {
+        return jornadaTrabalhoRepository.findById(workingDayId)
+            .map((jornadaTrabalho) -> usuarioMapper.toUsuarioDTOs(usuarioRepository.findByJornadaTrabalhoId(workingDayId)))
+            .orElseThrow(() -> new NotFoundException(UsuarioResponse.JORNADA_TRABALHO_NOT_FOUND));
     }
 }
