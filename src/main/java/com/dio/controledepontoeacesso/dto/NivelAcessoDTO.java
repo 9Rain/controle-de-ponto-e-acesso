@@ -10,14 +10,14 @@ import javax.validation.constraints.Size;
 public class NivelAcessoDTO {
     @Getter
     @Setter
-    private long id;
+    private Long id;
 
     @NotNull
     @NotBlank
     @Size(min = 1, max = 400)
     private String descricao;
 
-    public NivelAcessoDTO(long id, String descricao) {
+    public NivelAcessoDTO(Long id, String descricao) {
         this.id = id;
         this.setDescricao(descricao);
     }

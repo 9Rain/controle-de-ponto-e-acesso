@@ -19,4 +19,7 @@ public class Localidade {
     private long id;
 
     private String descricao;
+
+    @ManyToOne(optional = false)
+    private NivelAcesso nivelAcesso;
 }

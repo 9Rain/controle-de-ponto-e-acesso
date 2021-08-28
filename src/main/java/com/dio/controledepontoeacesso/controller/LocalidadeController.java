@@ -5,6 +5,7 @@ import com.dio.controledepontoeacesso.exception.NoSuchElementException;
 import com.dio.controledepontoeacesso.exception.NotFoundException;
 import com.dio.controledepontoeacesso.exception.RelationshipNotFoundException;
 import com.dio.controledepontoeacesso.model.Localidade;
+import com.dio.controledepontoeacesso.response.CalendarioResponse;
 import com.dio.controledepontoeacesso.response.LocalidadeResponse;
 import com.dio.controledepontoeacesso.response.TipoDataResponse;
 import com.dio.controledepontoeacesso.service.LocalidadeService;
@@ -27,12 +28,31 @@ public class LocalidadeController {
 
     @PostMapping
     public ResponseEntity<LocalidadeDTO> createLocalidade(@Valid @RequestBody LocalidadeDTO localidade){
-        return ResponseEntity.status(HttpStatus.CREATED).body(localidadeService.saveLocalidade(localidade));
+        var nivelAcessoId = Optional.ofNullable(localidade.getNivelAcesso().getId());
+
+        if(nivelAcessoId.isEmpty())
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, LocalidadeResponse.NIVEL_ACESSO_IS_REQUIRED, new NullPointerException());
+
+        try {
+            return ResponseEntity.status(HttpStatus.CREATED).body(localidadeService.saveLocalidade(localidade));
+        } catch (NotFoundException e) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, e.getMessage(), e);
+        } catch (Exception e){
+            throw new ResponseStatusException(
+                    HttpStatus.INTERNAL_SERVER_ERROR, LocalidadeResponse.INTERNAL_SERVER_ERROR, e);
+        }
     }
 
     @GetMapping
     public ResponseEntity<List<LocalidadeDTO>> getLocalidadeList(){
-        return ResponseEntity.ok(localidadeService.findAll());
+        try {
+            return ResponseEntity.ok(localidadeService.findAll());
+        } catch (Exception e){
+            throw new ResponseStatusException(
+                    HttpStatus.INTERNAL_SERVER_ERROR, LocalidadeResponse.INTERNAL_SERVER_ERROR, e);
+        }
     }
 
     @GetMapping("/{idLocalidade}")
@@ -41,19 +61,31 @@ public class LocalidadeController {
             return ResponseEntity.ok(localidadeService.getById(idLocalidade));
         } catch (NotFoundException e) {
             throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, LocalidadeResponse.ENTITY_NOT_FOUND, e);
+                    HttpStatus.NOT_FOUND, e.getMessage(), e);
+        } catch (Exception e){
+            throw new ResponseStatusException(
+                    HttpStatus.INTERNAL_SERVER_ERROR, LocalidadeResponse.INTERNAL_SERVER_ERROR, e);
         }
     }
 
     @PutMapping("/{idLocalidade}")
     public ResponseEntity<LocalidadeDTO> updateLocalidade(@PathVariable("idLocalidade") Long idLocalidade,
                                                        @Valid @RequestBody LocalidadeDTO localidade){
+        var nivelAcessoId = Optional.ofNullable(localidade.getNivelAcesso().getId());
+
+        if(nivelAcessoId.isEmpty())
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, LocalidadeResponse.NIVEL_ACESSO_IS_REQUIRED, new NullPointerException());
+
         try {
             localidade.setId(idLocalidade);
             return ResponseEntity.ok(localidadeService.updateLocalidade(localidade));
         } catch (NotFoundException e) {
             throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, LocalidadeResponse.ENTITY_NOT_FOUND, e);
+                    HttpStatus.NOT_FOUND, e.getMessage(), e);
+        } catch (Exception e){
+            throw new ResponseStatusException(
+                    HttpStatus.INTERNAL_SERVER_ERROR, LocalidadeResponse.INTERNAL_SERVER_ERROR, e);
         }
     }
 

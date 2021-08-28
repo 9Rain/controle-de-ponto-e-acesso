@@ -1,5 +1,6 @@
 package com.dio.controledepontoeacesso.dto;
 
+import com.dio.controledepontoeacesso.model.NivelAcesso;
 import lombok.*;
 
 import javax.validation.constraints.NotBlank;
@@ -20,9 +21,15 @@ public class LocalidadeDTO {
     @Size(min = 1, max = 400)
     private String descricao;
 
-    public LocalidadeDTO(long id, String descricao) {
+    @NotNull
+    @Getter
+    @Setter
+    private NivelAcesso nivelAcesso;
+
+    public LocalidadeDTO(long id, String descricao, NivelAcesso nivelAcesso) {
         this.id = id;
         this.setDescricao(descricao);
+        this.nivelAcesso = nivelAcesso;
     }
 
     public String getDescricao() {

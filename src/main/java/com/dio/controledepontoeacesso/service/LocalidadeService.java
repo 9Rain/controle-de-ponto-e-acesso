@@ -4,6 +4,7 @@ import com.dio.controledepontoeacesso.dto.LocalidadeDTO;
 import com.dio.controledepontoeacesso.exception.NotFoundException;
 import com.dio.controledepontoeacesso.mapper.LocalidadeMapper;
 import com.dio.controledepontoeacesso.repository.LocalidadeRepository;
+import com.dio.controledepontoeacesso.repository.NivelAcessoRepository;
 import com.dio.controledepontoeacesso.response.LocalidadeResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,14 +17,23 @@ public class LocalidadeService {
     LocalidadeRepository localidadeRepository;
 
     @Autowired
+    NivelAcessoRepository nivelAcessoRepository;
+
+    @Autowired
     LocalidadeMapper localidadeMapper;
 
-    public LocalidadeDTO saveLocalidade(LocalidadeDTO localidade) {
-        return localidadeMapper.toLocalidadeDTO(
-                localidadeRepository.save(
+    public LocalidadeDTO saveLocalidade(LocalidadeDTO localidade) throws NotFoundException {
+        return nivelAcessoRepository.findById(localidade.getNivelAcesso().getId())
+            .map((nivelAcesso) -> {
+                localidade.setNivelAcesso(nivelAcesso);
+
+                return localidadeMapper.toLocalidadeDTO(
+                    localidadeRepository.save(
                         localidadeMapper.toLocalidade(localidade)
-                )
-        );
+                    )
+                );
+            })
+            .orElseThrow(() -> new NotFoundException(LocalidadeResponse.NIVEL_ACESSO_NOT_FOUND));
     }
 
     public List<LocalidadeDTO> findAll() {
@@ -37,20 +47,30 @@ public class LocalidadeService {
     }
 
     public LocalidadeDTO updateLocalidade(LocalidadeDTO localidade) throws NotFoundException {
-        var localidadeToBeUpdated = localidadeRepository.findById(localidade.getId());
+        return localidadeRepository.findById(localidade.getId())
+            .map((localidadeToBeUpdated) -> 
+                nivelAcessoRepository.findById(localidade.getNivelAcesso().getId())
+                    .map((nivelAcesso) -> {
+                        localidade.setNivelAcesso(nivelAcesso);
 
-        if(localidadeToBeUpdated.isEmpty()) {
-            throw new NotFoundException(LocalidadeResponse.ENTITY_NOT_FOUND);
-        }
-
-        return localidadeMapper.toLocalidadeDTO(
-                localidadeRepository.save(
-                        localidadeMapper.toLocalidade(localidade)
-                )
-        );
+                        return localidadeMapper.toLocalidadeDTO(
+                            localidadeRepository.save(
+                                localidadeMapper.toLocalidade(localidade)
+                            )
+                        );
+                    })
+                    .orElseThrow(() -> new NotFoundException(LocalidadeResponse.NIVEL_ACESSO_NOT_FOUND))
+            )
+            .orElseThrow(() -> new NotFoundException(LocalidadeResponse.ENTITY_NOT_FOUND));
     }
 
     public void deleteLocalidade(Long idLocalidade) {
         localidadeRepository.deleteById(idLocalidade);
+    }
+
+    public List<LocalidadeDTO> findByNivelAcessoId(Long localId) throws NotFoundException {
+        return nivelAcessoRepository.findById(localId)
+            .map((nivelAcesso) -> localidadeMapper.toLocalidadeDTOs(localidadeRepository.findByNivelAcessoId(localId)))
+            .orElseThrow(() -> new NotFoundException(LocalidadeResponse.NIVEL_ACESSO_NOT_FOUND));
     }
 }
