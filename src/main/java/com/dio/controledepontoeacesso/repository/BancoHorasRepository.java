@@ -29,4 +29,9 @@ public interface BancoHorasRepository extends JpaRepository<BancoHoras, Long> {
 
     @Query(value = "SELECT BH FROM BancoHoras BH WHERE BH.movimentacao.id = :movimentacaoId")
     List<BancoHoras> findByMovimentacaoId(@Param("movimentacaoId") Long movimentacaoId);
+
+    @Transactional
+    @Modifying
+    @Query("DELETE BancoHoras BH WHERE BH.movimentacao IN (SELECT M FROM Movimentacao M WHERE M.ocorrencia.id = :ocorrenciaId)")
+    void deleteByOcorrenciaId(Long ocorrenciaId);
 }

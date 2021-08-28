@@ -3,6 +3,8 @@ package com.dio.controledepontoeacesso.service;
 import com.dio.controledepontoeacesso.dto.OcorrenciaDTO;
 import com.dio.controledepontoeacesso.exception.NotFoundException;
 import com.dio.controledepontoeacesso.mapper.OcorrenciaMapper;
+import com.dio.controledepontoeacesso.repository.BancoHorasRepository;
+import com.dio.controledepontoeacesso.repository.MovimentacaoRepository;
 import com.dio.controledepontoeacesso.repository.OcorrenciaRepository;
 import com.dio.controledepontoeacesso.response.OcorrenciaResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +16,12 @@ import java.util.List;
 public class OcorrenciaService {
     @Autowired
     OcorrenciaRepository ocorrenciaRepository;
+
+    @Autowired
+    BancoHorasRepository bancoHorasRepository;
+
+    @Autowired
+    MovimentacaoRepository movimentacaoRepository;
 
     @Autowired
     OcorrenciaMapper ocorrenciaMapper;
@@ -51,6 +59,8 @@ public class OcorrenciaService {
     }
 
     public void deleteOcorrencia(Long idOcorrencia) {
+        bancoHorasRepository.deleteByOcorrenciaId(idOcorrencia);
+        movimentacaoRepository.deleteByOcorrenciaId(idOcorrencia);
         ocorrenciaRepository.deleteById(idOcorrencia);
     }
 }

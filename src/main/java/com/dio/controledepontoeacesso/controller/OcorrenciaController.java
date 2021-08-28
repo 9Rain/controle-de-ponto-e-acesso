@@ -1,8 +1,10 @@
 package com.dio.controledepontoeacesso.controller;
 
+import com.dio.controledepontoeacesso.dto.MovimentacaoDTO;
 import com.dio.controledepontoeacesso.dto.OcorrenciaDTO;
 import com.dio.controledepontoeacesso.exception.NotFoundException;
 import com.dio.controledepontoeacesso.response.OcorrenciaResponse;
+import com.dio.controledepontoeacesso.service.MovimentacaoService;
 import com.dio.controledepontoeacesso.service.OcorrenciaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -20,14 +22,27 @@ public class OcorrenciaController {
     @Autowired
     OcorrenciaService ocorrenciaService;
 
+    @Autowired
+    MovimentacaoService movimentacaoService;
+
     @PostMapping
     public ResponseEntity<OcorrenciaDTO> createOcorrencia(@Valid @RequestBody OcorrenciaDTO occurrence){
-        return ResponseEntity.status(HttpStatus.CREATED).body(ocorrenciaService.saveOcorrencia(occurrence));
+        try {
+            return ResponseEntity.status(HttpStatus.CREATED).body(ocorrenciaService.saveOcorrencia(occurrence));
+        } catch (Exception e){
+            throw new ResponseStatusException(
+                    HttpStatus.INTERNAL_SERVER_ERROR, OcorrenciaResponse.INTERNAL_SERVER_ERROR, e);
+        }
     }
 
     @GetMapping
     public ResponseEntity<List<OcorrenciaDTO>> getOcorrenciaList(){
-        return ResponseEntity.ok(ocorrenciaService.findAll());
+        try {
+            return ResponseEntity.ok(ocorrenciaService.findAll());
+        } catch (Exception e){
+            throw new ResponseStatusException(
+                    HttpStatus.INTERNAL_SERVER_ERROR, OcorrenciaResponse.INTERNAL_SERVER_ERROR, e);
+        }
     }
 
     @GetMapping("/{occurrenceId}")
@@ -36,7 +51,10 @@ public class OcorrenciaController {
             return ResponseEntity.ok(ocorrenciaService.getById(occurrenceId));
         } catch (NotFoundException e) {
             throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, OcorrenciaResponse.ENTITY_NOT_FOUND, e);
+                    HttpStatus.NOT_FOUND, e.getMessage(), e);
+        } catch (Exception e){
+            throw new ResponseStatusException(
+                    HttpStatus.INTERNAL_SERVER_ERROR, OcorrenciaResponse.INTERNAL_SERVER_ERROR, e);
         }
     }
 
@@ -48,7 +66,10 @@ public class OcorrenciaController {
             return ResponseEntity.ok(ocorrenciaService.updateOcorrencia(occurrence));
         } catch (NotFoundException e) {
             throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, OcorrenciaResponse.ENTITY_NOT_FOUND, e);
+                    HttpStatus.NOT_FOUND, e.getMessage(), e);
+        } catch (Exception e){
+            throw new ResponseStatusException(
+                    HttpStatus.INTERNAL_SERVER_ERROR, OcorrenciaResponse.INTERNAL_SERVER_ERROR, e);
         }
     }
 
@@ -60,6 +81,19 @@ public class OcorrenciaController {
         } catch (EmptyResultDataAccessException e){
             throw new ResponseStatusException(
                     HttpStatus.NOT_FOUND, OcorrenciaResponse.ENTITY_NOT_FOUND, e);
+        } catch (Exception e){
+            throw new ResponseStatusException(
+                    HttpStatus.INTERNAL_SERVER_ERROR, OcorrenciaResponse.INTERNAL_SERVER_ERROR, e);
+        }
+    }
+
+    @GetMapping("/{occurrenceId}/movements")
+    public ResponseEntity<List<MovimentacaoDTO>> listOcorrenciaMovimentacoes(@PathVariable("occurrenceId") Long occurrenceId) {
+        try {
+            return ResponseEntity.ok(movimentacaoService.findByOcorrenciaId(occurrenceId));
+        } catch (NotFoundException e) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, e.getMessage(), e);
         } catch (Exception e){
             throw new ResponseStatusException(
                     HttpStatus.INTERNAL_SERVER_ERROR, OcorrenciaResponse.INTERNAL_SERVER_ERROR, e);

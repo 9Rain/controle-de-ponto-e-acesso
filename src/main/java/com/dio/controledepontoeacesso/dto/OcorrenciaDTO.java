@@ -13,7 +13,7 @@ import javax.validation.constraints.Size;
 public class OcorrenciaDTO {
     @Getter
     @Setter
-    private long id;
+    private Long id;
 
     @NotNull
     @NotBlank
@@ -25,7 +25,7 @@ public class OcorrenciaDTO {
     @Size(min = 1, max = 400)
     private String descricao;
 
-    public OcorrenciaDTO(long id, String nome, String descricao) {
+    public OcorrenciaDTO(Long id, String nome, String descricao) {
         this.id = id;
         this.setNome(nome);
         this.setDescricao(descricao);

@@ -26,4 +26,7 @@ public class Movimentacao {
 
     @ManyToOne(optional = false)
     private Calendario calendario;
+
+    @ManyToOne(optional = false)
+    private Ocorrencia ocorrencia;
 }

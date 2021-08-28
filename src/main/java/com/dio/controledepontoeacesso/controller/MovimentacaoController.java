@@ -41,6 +41,12 @@ public class MovimentacaoController {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST, MovimentacaoResponse.CALENDARIO_IS_REQUIRED, new NullPointerException());
 
+        var ocorrenciaId = Optional.ofNullable(movement.getOcorrencia().getId());
+
+        if(ocorrenciaId.isEmpty())
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, MovimentacaoResponse.OCORRENCIA_IS_REQUIRED, new NullPointerException());
+
         try {
             return ResponseEntity.status(HttpStatus.CREATED).body(movimentacaoService.saveMovimentacao(movement));
         } catch (NotFoundException e) {
@@ -83,6 +89,12 @@ public class MovimentacaoController {
         if(calendarioId.isEmpty())
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST, MovimentacaoResponse.CALENDARIO_IS_REQUIRED, new NullPointerException());
+
+        var ocorrenciaId = Optional.ofNullable(movement.getOcorrencia().getId());
+
+        if(ocorrenciaId.isEmpty())
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, MovimentacaoResponse.OCORRENCIA_IS_REQUIRED, new NullPointerException());
 
         try {
             movement.setId(movementId);
