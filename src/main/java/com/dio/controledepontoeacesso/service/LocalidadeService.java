@@ -68,9 +68,9 @@ public class LocalidadeService {
         localidadeRepository.deleteById(idLocalidade);
     }
 
-    public List<LocalidadeDTO> findByNivelAcessoId(Long localId) throws NotFoundException {
-        return nivelAcessoRepository.findById(localId)
-            .map((nivelAcesso) -> localidadeMapper.toLocalidadeDTOs(localidadeRepository.findByNivelAcessoId(localId)))
+    public List<LocalidadeDTO> findByNivelAcessoId(Long accessLevelId) throws NotFoundException {
+        return nivelAcessoRepository.findById(accessLevelId)
+            .map((nivelAcesso) -> localidadeMapper.toLocalidadeDTOs(localidadeRepository.findByNivelAcessoId(accessLevelId)))
             .orElseThrow(() -> new NotFoundException(LocalidadeResponse.NIVEL_ACESSO_NOT_FOUND));
     }
 }

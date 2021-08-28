@@ -23,4 +23,7 @@ public class Movimentacao {
     private LocalDateTime dataSaida;
 
     private BigDecimal periodo;
+
+    @ManyToOne(optional = false)
+    private Calendario calendario;
 }

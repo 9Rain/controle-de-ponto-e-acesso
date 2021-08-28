@@ -1,5 +1,6 @@
 package com.dio.controledepontoeacesso.dto;
 
+import com.dio.controledepontoeacesso.model.Calendario;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 
@@ -27,4 +28,9 @@ public class MovimentacaoDTO {
 
     @NotNull
     private BigDecimal periodo;
+
+    @NotNull
+    @Getter
+    @Setter
+    private Calendario calendario;
 }

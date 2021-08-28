@@ -3,6 +3,7 @@ package com.dio.controledepontoeacesso.service;
 import com.dio.controledepontoeacesso.dto.MovimentacaoDTO;
 import com.dio.controledepontoeacesso.exception.NotFoundException;
 import com.dio.controledepontoeacesso.mapper.MovimentacaoMapper;
+import com.dio.controledepontoeacesso.repository.CalendarioRepository;
 import com.dio.controledepontoeacesso.repository.MovimentacaoRepository;
 import com.dio.controledepontoeacesso.response.MovimentacaoResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,14 +17,23 @@ public class MovimentacaoService {
     MovimentacaoRepository movimentacaoRepository;
 
     @Autowired
+    CalendarioRepository calendarioRepository;
+
+    @Autowired
     MovimentacaoMapper movimentacaoMapper;
 
-    public MovimentacaoDTO saveMovimentacao(MovimentacaoDTO movimentacao){
-        return movimentacaoMapper.toMovimentacaoDTO(
-                movimentacaoRepository.save(
+    public MovimentacaoDTO saveMovimentacao(MovimentacaoDTO movimentacao) throws NotFoundException {
+        return calendarioRepository.findById(movimentacao.getCalendario().getId())
+            .map((calendario) -> {
+                movimentacao.setCalendario(calendario);
+
+                return movimentacaoMapper.toMovimentacaoDTO(
+                    movimentacaoRepository.save(
                         movimentacaoMapper.toMovimentacao(movimentacao)
-                )
-        );
+                    )
+                );
+            })
+            .orElseThrow(() -> new NotFoundException(MovimentacaoResponse.CALENDARIO_NOT_FOUND));
     }
 
     public List<MovimentacaoDTO> findAll() {
@@ -37,20 +47,30 @@ public class MovimentacaoService {
     }
 
     public MovimentacaoDTO updateMovimentacao(MovimentacaoDTO movimentacao) throws NotFoundException {
-        var movimentacaoToBeUpdated = movimentacaoRepository.findById(movimentacao.getId());
+        return movimentacaoRepository.findById(movimentacao.getId())
+            .map((movimentacaoToBeUpdated) ->
+                calendarioRepository.findById(movimentacao.getCalendario().getId())
+                    .map((calendario) -> {
+                        movimentacao.setCalendario(calendario);
 
-        if(movimentacaoToBeUpdated.isEmpty()) {
-            throw new NotFoundException(MovimentacaoResponse.ENTITY_NOT_FOUND);
-        }
-
-        return movimentacaoMapper.toMovimentacaoDTO(
-                movimentacaoRepository.save(
-                        movimentacaoMapper.toMovimentacao(movimentacao)
-                )
-        );
+                        return movimentacaoMapper.toMovimentacaoDTO(
+                                movimentacaoRepository.save(
+                                        movimentacaoMapper.toMovimentacao(movimentacao)
+                                )
+                        );
+                    })
+                    .orElseThrow(() -> new NotFoundException(MovimentacaoResponse.CALENDARIO_NOT_FOUND))
+            )
+            .orElseThrow(() -> new NotFoundException(MovimentacaoResponse.ENTITY_NOT_FOUND));
     }
 
     public void deleteMovimentacao(Long idMovimentacao) {
         movimentacaoRepository.deleteById(idMovimentacao);
+    }
+
+    public List<MovimentacaoDTO> findByCalendarioId(Long calendarId) throws NotFoundException {
+        return calendarioRepository.findById(calendarId)
+            .map((nivelAcesso) -> movimentacaoMapper.toMovimentacaoDTOs(movimentacaoRepository.findByCalendarioId(calendarId)))
+            .orElseThrow(() -> new NotFoundException(MovimentacaoResponse.CALENDARIO_NOT_FOUND));
     }
 }

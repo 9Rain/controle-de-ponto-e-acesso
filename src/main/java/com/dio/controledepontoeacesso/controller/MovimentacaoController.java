@@ -5,6 +5,7 @@ import com.dio.controledepontoeacesso.exception.NoSuchElementException;
 import com.dio.controledepontoeacesso.exception.NotFoundException;
 import com.dio.controledepontoeacesso.exception.RelationshipNotFoundException;
 import com.dio.controledepontoeacesso.model.Movimentacao;
+import com.dio.controledepontoeacesso.response.LocalidadeResponse;
 import com.dio.controledepontoeacesso.response.MovimentacaoResponse;
 import com.dio.controledepontoeacesso.service.MovimentacaoService;
 import com.dio.controledepontoeacesso.service.MovimentacaoService;
@@ -27,12 +28,31 @@ public class MovimentacaoController {
 
     @PostMapping
     public ResponseEntity<MovimentacaoDTO> createMovimentacao(@Valid @RequestBody MovimentacaoDTO movement){
-        return ResponseEntity.status(HttpStatus.CREATED).body(movimentacaoService.saveMovimentacao(movement));
+        var calendarioId = Optional.ofNullable(movement.getCalendario().getId());
+
+        if(calendarioId.isEmpty())
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, MovimentacaoResponse.CALENDARIO_IS_REQUIRED, new NullPointerException());
+
+        try {
+            return ResponseEntity.status(HttpStatus.CREATED).body(movimentacaoService.saveMovimentacao(movement));
+        } catch (NotFoundException e) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, e.getMessage(), e);
+        } catch (Exception e){
+            throw new ResponseStatusException(
+                    HttpStatus.INTERNAL_SERVER_ERROR, MovimentacaoResponse.INTERNAL_SERVER_ERROR, e);
+        }
     }
 
     @GetMapping
     public ResponseEntity<List<MovimentacaoDTO>> getMovimentacaoList(){
-        return ResponseEntity.ok(movimentacaoService.findAll());
+        try {
+            return ResponseEntity.ok(movimentacaoService.findAll());
+        } catch (Exception e){
+            throw new ResponseStatusException(
+                    HttpStatus.INTERNAL_SERVER_ERROR, MovimentacaoResponse.INTERNAL_SERVER_ERROR, e);
+        }
     }
 
     @GetMapping("/{movementId}")
@@ -41,19 +61,31 @@ public class MovimentacaoController {
             return ResponseEntity.ok(movimentacaoService.getById(movementId));
         } catch (NotFoundException e) {
             throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, MovimentacaoResponse.ENTITY_NOT_FOUND, e);
+                    HttpStatus.NOT_FOUND, e.getMessage(), e);
+        } catch (Exception e){
+            throw new ResponseStatusException(
+                    HttpStatus.INTERNAL_SERVER_ERROR, MovimentacaoResponse.INTERNAL_SERVER_ERROR, e);
         }
     }
 
     @PutMapping("/{movementId}")
     public ResponseEntity<MovimentacaoDTO> updateMovimentacao(@PathVariable("movementId") Long movementId,
                                                           @Valid @RequestBody MovimentacaoDTO movement){
+        var calendarioId = Optional.ofNullable(movement.getCalendario().getId());
+
+        if(calendarioId.isEmpty())
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, MovimentacaoResponse.CALENDARIO_IS_REQUIRED, new NullPointerException());
+
         try {
             movement.setId(movementId);
             return ResponseEntity.ok(movimentacaoService.updateMovimentacao(movement));
         } catch (NotFoundException e) {
             throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, MovimentacaoResponse.ENTITY_NOT_FOUND, e);
+                    HttpStatus.NOT_FOUND, e.getMessage(), e);
+        } catch (Exception e){
+            throw new ResponseStatusException(
+                    HttpStatus.INTERNAL_SERVER_ERROR, MovimentacaoResponse.INTERNAL_SERVER_ERROR, e);
         }
     }
 
