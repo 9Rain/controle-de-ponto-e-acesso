@@ -13,10 +13,13 @@ import javax.persistence.*;
 @Builder
 @Entity
 @Audited
+@Table(name = "tb_tipo_data")
 public class TipoData {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
 
+    @Column(name = "descricao")
     private String descricao;
 }

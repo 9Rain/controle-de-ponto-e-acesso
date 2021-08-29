@@ -3,10 +3,7 @@ package com.dio.controledepontoeacesso.model;
 import lombok.*;
 import org.hibernate.envers.Audited;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Getter
 @Setter
@@ -16,10 +13,13 @@ import javax.persistence.Id;
 @Builder
 @Entity
 @Audited
+@Table(name = "tb_jornada_trabalho")
 public class JornadaTrabalho {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
 
+    @Column(name = "descricao")
     private String descricao;
 }
