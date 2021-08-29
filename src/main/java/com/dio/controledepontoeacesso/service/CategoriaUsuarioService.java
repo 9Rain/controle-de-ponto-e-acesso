@@ -1,21 +1,17 @@
 package com.dio.controledepontoeacesso.service;
 
 import com.dio.controledepontoeacesso.dto.CategoriaUsuarioDTO;
-import com.dio.controledepontoeacesso.exception.NoSuchElementException;
 import com.dio.controledepontoeacesso.exception.NotFoundException;
 import com.dio.controledepontoeacesso.mapper.CategoriaUsuarioMapper;
-import com.dio.controledepontoeacesso.model.CategoriaUsuario;
 import com.dio.controledepontoeacesso.repository.BancoHorasRepository;
 import com.dio.controledepontoeacesso.repository.CategoriaUsuarioRepository;
 import com.dio.controledepontoeacesso.repository.MovimentacaoRepository;
 import com.dio.controledepontoeacesso.repository.UsuarioRepository;
 import com.dio.controledepontoeacesso.response.CategoriaUsuarioResponse;
-import com.dio.controledepontoeacesso.response.OcorrenciaResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class CategoriaUsuarioService {

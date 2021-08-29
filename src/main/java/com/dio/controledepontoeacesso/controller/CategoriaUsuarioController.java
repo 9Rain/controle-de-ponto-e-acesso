@@ -2,13 +2,9 @@ package com.dio.controledepontoeacesso.controller;
 
 import com.dio.controledepontoeacesso.dto.CategoriaUsuarioDTO;
 import com.dio.controledepontoeacesso.dto.UsuarioDTO;
-import com.dio.controledepontoeacesso.exception.NoSuchElementException;
 import com.dio.controledepontoeacesso.exception.NotFoundException;
-import com.dio.controledepontoeacesso.model.CategoriaUsuario;
 import com.dio.controledepontoeacesso.response.CategoriaUsuarioResponse;
-import com.dio.controledepontoeacesso.response.JornadaTrabalhoResponse;
 import com.dio.controledepontoeacesso.response.OcorrenciaResponse;
-import com.dio.controledepontoeacesso.response.Response;
 import com.dio.controledepontoeacesso.service.CategoriaUsuarioService;
 import com.dio.controledepontoeacesso.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;

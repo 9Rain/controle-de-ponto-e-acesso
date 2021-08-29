@@ -1,15 +1,10 @@
 package com.dio.controledepontoeacesso.controller;
 
-import com.dio.controledepontoeacesso.dto.CalendarioDTO;
 import com.dio.controledepontoeacesso.dto.LocalidadeDTO;
 import com.dio.controledepontoeacesso.dto.NivelAcessoDTO;
 import com.dio.controledepontoeacesso.dto.UsuarioDTO;
-import com.dio.controledepontoeacesso.exception.NoSuchElementException;
 import com.dio.controledepontoeacesso.exception.NotFoundException;
-import com.dio.controledepontoeacesso.model.NivelAcesso;
 import com.dio.controledepontoeacesso.response.NivelAcessoResponse;
-import com.dio.controledepontoeacesso.response.OcorrenciaResponse;
-import com.dio.controledepontoeacesso.response.TipoDataResponse;
 import com.dio.controledepontoeacesso.service.LocalidadeService;
 import com.dio.controledepontoeacesso.service.NivelAcessoService;
 import com.dio.controledepontoeacesso.service.UsuarioService;

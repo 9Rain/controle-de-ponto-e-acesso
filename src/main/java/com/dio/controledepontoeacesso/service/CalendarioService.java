@@ -8,7 +8,6 @@ import com.dio.controledepontoeacesso.repository.CalendarioRepository;
 import com.dio.controledepontoeacesso.repository.MovimentacaoRepository;
 import com.dio.controledepontoeacesso.repository.TipoDataRepository;
 import com.dio.controledepontoeacesso.response.CalendarioResponse;
-import com.dio.controledepontoeacesso.response.TipoDataResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

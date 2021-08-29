@@ -1,17 +1,10 @@
 package com.dio.controledepontoeacesso.controller;
 
 import com.dio.controledepontoeacesso.dto.BancoHorasDTO;
-import com.dio.controledepontoeacesso.dto.LocalidadeDTO;
 import com.dio.controledepontoeacesso.dto.MovimentacaoDTO;
-import com.dio.controledepontoeacesso.exception.NoSuchElementException;
 import com.dio.controledepontoeacesso.exception.NotFoundException;
-import com.dio.controledepontoeacesso.exception.RelationshipNotFoundException;
-import com.dio.controledepontoeacesso.model.Movimentacao;
-import com.dio.controledepontoeacesso.response.LocalidadeResponse;
 import com.dio.controledepontoeacesso.response.MovimentacaoResponse;
-import com.dio.controledepontoeacesso.response.NivelAcessoResponse;
 import com.dio.controledepontoeacesso.service.BancoHorasService;
-import com.dio.controledepontoeacesso.service.MovimentacaoService;
 import com.dio.controledepontoeacesso.service.MovimentacaoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;

@@ -3,7 +3,6 @@ package com.dio.controledepontoeacesso.controller;
 import com.dio.controledepontoeacesso.dto.BancoHorasDTO;
 import com.dio.controledepontoeacesso.exception.NotFoundException;
 import com.dio.controledepontoeacesso.response.BancoHorasResponse;
-import com.dio.controledepontoeacesso.response.LocalidadeResponse;
 import com.dio.controledepontoeacesso.service.BancoHorasService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;

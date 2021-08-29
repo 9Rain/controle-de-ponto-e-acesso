@@ -18,7 +18,7 @@ import com.dio.controledepontoeacesso.validator.UFValidator;
 @Documented
 public @interface UF {
 
-    String message() default "Estado inválido";
+    String message() default "UF is invalid";
 
     Class<?>[] groups() default {};
 

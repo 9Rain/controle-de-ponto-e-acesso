@@ -1,13 +1,8 @@
 package com.dio.controledepontoeacesso.controller;
 
 import com.dio.controledepontoeacesso.dto.LocalidadeDTO;
-import com.dio.controledepontoeacesso.exception.NoSuchElementException;
 import com.dio.controledepontoeacesso.exception.NotFoundException;
-import com.dio.controledepontoeacesso.exception.RelationshipNotFoundException;
-import com.dio.controledepontoeacesso.model.Localidade;
-import com.dio.controledepontoeacesso.response.CalendarioResponse;
 import com.dio.controledepontoeacesso.response.LocalidadeResponse;
-import com.dio.controledepontoeacesso.response.TipoDataResponse;
 import com.dio.controledepontoeacesso.service.LocalidadeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
