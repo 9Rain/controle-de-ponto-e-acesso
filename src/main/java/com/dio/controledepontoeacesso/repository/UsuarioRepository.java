@@ -25,6 +25,11 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
     @Query("DELETE Usuario U WHERE U.empresa.id = :empresaId")
     void deleteByEmpresaId(@Param("empresaId") Long empresaId);
 
+    @Transactional
+    @Modifying
+    @Query("DELETE Usuario U WHERE U.nivelAcesso.id = :nivelAcessoId")
+    void deleteByNivelAcessoId(@Param("nivelAcessoId") Long nivelAcessoId);
+
     @Query(value = "SELECT U FROM Usuario U WHERE U.jornadaTrabalho.id = :jornadaTrabalhoId")
     List<Usuario> findByJornadaTrabalhoId(@Param("jornadaTrabalhoId") Long jornadaTrabalhoId);
 
@@ -33,4 +38,7 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
 
     @Query(value = "SELECT U FROM Usuario U WHERE U.empresa.id = :empresaId")
     List<Usuario> findByEmpresaId(@Param("empresaId") Long empresaId);
+
+    @Query(value = "SELECT U FROM Usuario U WHERE U.nivelAcesso.id = :nivelAcessoId")
+    List<Usuario> findByNivelAcessoId(@Param("nivelAcessoId") Long nivelAcessoId);
 }

@@ -3,6 +3,7 @@ package com.dio.controledepontoeacesso.controller;
 import com.dio.controledepontoeacesso.dto.CalendarioDTO;
 import com.dio.controledepontoeacesso.dto.LocalidadeDTO;
 import com.dio.controledepontoeacesso.dto.NivelAcessoDTO;
+import com.dio.controledepontoeacesso.dto.UsuarioDTO;
 import com.dio.controledepontoeacesso.exception.NoSuchElementException;
 import com.dio.controledepontoeacesso.exception.NotFoundException;
 import com.dio.controledepontoeacesso.model.NivelAcesso;
@@ -11,6 +12,7 @@ import com.dio.controledepontoeacesso.response.OcorrenciaResponse;
 import com.dio.controledepontoeacesso.response.TipoDataResponse;
 import com.dio.controledepontoeacesso.service.LocalidadeService;
 import com.dio.controledepontoeacesso.service.NivelAcessoService;
+import com.dio.controledepontoeacesso.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
@@ -30,6 +32,9 @@ public class NivelAcessoController {
 
     @Autowired
     LocalidadeService localidadeService;
+
+    @Autowired
+    UsuarioService usuarioService;
 
     @PostMapping
     public ResponseEntity<NivelAcessoDTO> createNivelAcesso(@Valid @RequestBody NivelAcessoDTO accessLevel){
@@ -97,6 +102,19 @@ public class NivelAcessoController {
     public ResponseEntity<List<LocalidadeDTO>> listNivelAcessoLocalidades(@PathVariable("nivelAcessoId") Long nivelAcessoId) {
         try {
             return ResponseEntity.ok(localidadeService.findByNivelAcessoId(nivelAcessoId));
+        } catch (NotFoundException e) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, e.getMessage(), e);
+        } catch (Exception e){
+            throw new ResponseStatusException(
+                    HttpStatus.INTERNAL_SERVER_ERROR, NivelAcessoResponse.INTERNAL_SERVER_ERROR, e);
+        }
+    }
+
+    @GetMapping("/{nivelAcessoId}/users")
+    public ResponseEntity<List<UsuarioDTO>> listNivelAcessoUsuarios(@PathVariable("nivelAcessoId") Long nivelAcessoId) {
+        try {
+            return ResponseEntity.ok(usuarioService.findByNivelAcessoId(nivelAcessoId));
         } catch (NotFoundException e) {
             throw new ResponseStatusException(
                     HttpStatus.NOT_FOUND, e.getMessage(), e);

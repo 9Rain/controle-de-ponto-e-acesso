@@ -36,4 +36,7 @@ public class Usuario {
 
     @ManyToOne(optional = false)
     private Empresa empresa;
+
+    @ManyToOne(optional = false)
+    private NivelAcesso nivelAcesso;
 }

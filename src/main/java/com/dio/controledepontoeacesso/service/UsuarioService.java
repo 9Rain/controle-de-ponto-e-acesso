@@ -3,10 +3,7 @@ package com.dio.controledepontoeacesso.service;
 import com.dio.controledepontoeacesso.dto.UsuarioDTO;
 import com.dio.controledepontoeacesso.exception.NotFoundException;
 import com.dio.controledepontoeacesso.mapper.UsuarioMapper;
-import com.dio.controledepontoeacesso.repository.CategoriaUsuarioRepository;
-import com.dio.controledepontoeacesso.repository.EmpresaRepository;
-import com.dio.controledepontoeacesso.repository.JornadaTrabalhoRepository;
-import com.dio.controledepontoeacesso.repository.UsuarioRepository;
+import com.dio.controledepontoeacesso.repository.*;
 import com.dio.controledepontoeacesso.response.UsuarioResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,6 +25,9 @@ public class UsuarioService {
     EmpresaRepository empresaRepository;
 
     @Autowired
+    NivelAcessoRepository nivelAcessoRepository;
+
+    @Autowired
     UsuarioMapper usuarioMapper;
 
     public UsuarioDTO saveUsuario(UsuarioDTO usuario) throws NotFoundException {
@@ -43,11 +43,17 @@ public class UsuarioService {
                             .map((empresa) -> {
                                 usuario.setEmpresa(empresa);
 
-                                return usuarioMapper.toUsuarioDTO(
-                                    usuarioRepository.save(
-                                        usuarioMapper.toUsuario(usuario)
-                                    )
-                                );
+                                return nivelAcessoRepository.findById(usuario.getNivelAcesso().getId())
+                                    .map((nivelAcesso) -> {
+                                        usuario.setNivelAcesso(nivelAcesso);
+
+                                        return usuarioMapper.toUsuarioDTO(
+                                            usuarioRepository.save(
+                                                usuarioMapper.toUsuario(usuario)
+                                            )
+                                        );
+                                    })
+                                    .orElseThrow(() -> new NotFoundException(UsuarioResponse.NIVEL_ACESSO_NOT_FOUND));
                             })
                             .orElseThrow(() -> new NotFoundException(UsuarioResponse.EMPRESA_NOT_FOUND));
                     })
@@ -81,11 +87,17 @@ public class UsuarioService {
                                     .map((empresa) -> {
                                         usuario.setEmpresa(empresa);
 
-                                        return usuarioMapper.toUsuarioDTO(
-                                            usuarioRepository.save(
-                                                usuarioMapper.toUsuario(usuario)
-                                            )
-                                        );
+                                        return nivelAcessoRepository.findById(usuario.getNivelAcesso().getId())
+                                            .map((nivelAcesso) -> {
+                                                usuario.setNivelAcesso(nivelAcesso);
+
+                                                return usuarioMapper.toUsuarioDTO(
+                                                    usuarioRepository.save(
+                                                        usuarioMapper.toUsuario(usuario)
+                                                    )
+                                                );
+                                            })
+                                            .orElseThrow(() -> new NotFoundException(UsuarioResponse.NIVEL_ACESSO_NOT_FOUND));
                                     })
                                     .orElseThrow(() -> new NotFoundException(UsuarioResponse.EMPRESA_NOT_FOUND));
                             })
@@ -114,7 +126,13 @@ public class UsuarioService {
 
     public List<UsuarioDTO> findByEmpresaId(Long companyId) throws NotFoundException {
         return empresaRepository.findById(companyId)
-                .map((empresa) -> usuarioMapper.toUsuarioDTOs(usuarioRepository.findByEmpresaId(companyId)))
-                .orElseThrow(() -> new NotFoundException(UsuarioResponse.EMPRESA_NOT_FOUND));
+            .map((empresa) -> usuarioMapper.toUsuarioDTOs(usuarioRepository.findByEmpresaId(companyId)))
+            .orElseThrow(() -> new NotFoundException(UsuarioResponse.EMPRESA_NOT_FOUND));
+    }
+
+    public List<UsuarioDTO> findByNivelAcessoId(Long accessLevelId) throws NotFoundException {
+        return nivelAcessoRepository.findById(accessLevelId)
+            .map((nivelAcesso) -> usuarioMapper.toUsuarioDTOs(usuarioRepository.findByNivelAcessoId(accessLevelId)))
+            .orElseThrow(() -> new NotFoundException(UsuarioResponse.NIVEL_ACESSO_NOT_FOUND));
     }
 }

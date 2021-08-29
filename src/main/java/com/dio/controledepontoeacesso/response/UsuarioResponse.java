@@ -19,4 +19,8 @@ public class UsuarioResponse extends Response {
     public static final String EMPRESA_NOT_FOUND = EmpresaResponse.ENTITY_NOT_FOUND;
 
     public static final String EMPRESA_IS_REQUIRED = EmpresaResponse.ENTITY_IS_REQUIRED;
+
+    public static final String NIVEL_ACESSO_NOT_FOUND = NivelAcessoResponse.ENTITY_NOT_FOUND;
+
+    public static final String NIVEL_ACESSO_IS_REQUIRED = NivelAcessoResponse.ENTITY_IS_REQUIRED;
 }
