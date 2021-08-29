@@ -47,6 +47,12 @@ public class MovimentacaoController {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST, MovimentacaoResponse.OCORRENCIA_IS_REQUIRED, new NullPointerException());
 
+        var usuarioId = Optional.ofNullable(movement.getUsuario().getId());
+
+        if(usuarioId.isEmpty())
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, MovimentacaoResponse.USUARIO_IS_REQUIRED, new NullPointerException());
+
         try {
             return ResponseEntity.status(HttpStatus.CREATED).body(movimentacaoService.saveMovimentacao(movement));
         } catch (NotFoundException e) {
@@ -95,6 +101,12 @@ public class MovimentacaoController {
         if(ocorrenciaId.isEmpty())
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST, MovimentacaoResponse.OCORRENCIA_IS_REQUIRED, new NullPointerException());
+
+        var usuarioId = Optional.ofNullable(movement.getUsuario().getId());
+
+        if(usuarioId.isEmpty())
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, MovimentacaoResponse.USUARIO_IS_REQUIRED, new NullPointerException());
 
         try {
             movement.setId(movementId);

@@ -29,4 +29,7 @@ public class Movimentacao {
 
     @ManyToOne(optional = false)
     private Ocorrencia ocorrencia;
+
+    @ManyToOne(optional = false)
+    private Usuario usuario;
 }

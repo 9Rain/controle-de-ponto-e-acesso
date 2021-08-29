@@ -28,6 +28,12 @@ public class UsuarioService {
     NivelAcessoRepository nivelAcessoRepository;
 
     @Autowired
+    BancoHorasRepository bancoHorasRepository;
+
+    @Autowired
+    MovimentacaoRepository movimentacaoRepository;
+
+    @Autowired
     UsuarioMapper usuarioMapper;
 
     public UsuarioDTO saveUsuario(UsuarioDTO usuario) throws NotFoundException {
@@ -109,6 +115,8 @@ public class UsuarioService {
     }
 
     public void deleteUsuario(Long idUsuario) {
+        bancoHorasRepository.deleteByUsuarioId(idUsuario);
+        movimentacaoRepository.deleteByUsuarioId(idUsuario);
         usuarioRepository.deleteById(idUsuario);
     }
 

@@ -15,4 +15,8 @@ public class MovimentacaoResponse extends Response {
     public static final String OCORRENCIA_NOT_FOUND = OcorrenciaResponse.ENTITY_NOT_FOUND;
 
     public static final String OCORRENCIA_IS_REQUIRED = OcorrenciaResponse.ENTITY_IS_REQUIRED;
+
+    public static final String USUARIO_NOT_FOUND = UsuarioResponse.ENTITY_NOT_FOUND;
+
+    public static final String USUARIO_IS_REQUIRED = UsuarioResponse.ENTITY_IS_REQUIRED;
 }

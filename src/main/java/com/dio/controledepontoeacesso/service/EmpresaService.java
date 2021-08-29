@@ -3,7 +3,9 @@ package com.dio.controledepontoeacesso.service;
 import com.dio.controledepontoeacesso.dto.EmpresaDTO;
 import com.dio.controledepontoeacesso.exception.NotFoundException;
 import com.dio.controledepontoeacesso.mapper.EmpresaMapper;
+import com.dio.controledepontoeacesso.repository.BancoHorasRepository;
 import com.dio.controledepontoeacesso.repository.EmpresaRepository;
+import com.dio.controledepontoeacesso.repository.MovimentacaoRepository;
 import com.dio.controledepontoeacesso.repository.UsuarioRepository;
 import com.dio.controledepontoeacesso.response.EmpresaResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +20,12 @@ public class EmpresaService {
 
     @Autowired
     UsuarioRepository usuarioRepository;
+
+    @Autowired
+    BancoHorasRepository bancoHorasRepository;
+
+    @Autowired
+    MovimentacaoRepository movimentacaoRepository;
 
     @Autowired
     EmpresaMapper empresaMapper;
@@ -55,6 +63,8 @@ public class EmpresaService {
     }
 
     public void deleteEmpresa(Long idEmpresa) {
+        bancoHorasRepository.deleteByEmpresaId(idEmpresa);
+        movimentacaoRepository.deleteByEmpresaId(idEmpresa);
         usuarioRepository.deleteByEmpresaId(idEmpresa);
         empresaRepository.deleteById(idEmpresa);
     }

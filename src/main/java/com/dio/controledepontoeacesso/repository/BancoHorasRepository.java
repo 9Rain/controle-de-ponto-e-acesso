@@ -27,11 +27,36 @@ public interface BancoHorasRepository extends JpaRepository<BancoHoras, Long> {
     @Query("DELETE BancoHoras BH WHERE BH.movimentacao IN (SELECT M FROM Movimentacao M JOIN Calendario C ON M.calendario.id = C.id WHERE C.tipoData.id = :tipoDataId)")
     void deleteByTipoDataId(@Param("tipoDataId") Long tipoDataId);
 
-    @Query(value = "SELECT BH FROM BancoHoras BH WHERE BH.movimentacao.id = :movimentacaoId")
-    List<BancoHoras> findByMovimentacaoId(@Param("movimentacaoId") Long movimentacaoId);
-
     @Transactional
     @Modifying
     @Query("DELETE BancoHoras BH WHERE BH.movimentacao IN (SELECT M FROM Movimentacao M WHERE M.ocorrencia.id = :ocorrenciaId)")
     void deleteByOcorrenciaId(Long ocorrenciaId);
+
+    @Transactional
+    @Modifying
+    @Query("DELETE BancoHoras BH WHERE BH.movimentacao IN (SELECT M FROM Movimentacao M WHERE M.usuario.id = :usuarioId)")
+    void deleteByUsuarioId(@Param("usuarioId") Long usuarioId);
+
+    @Transactional
+    @Modifying
+    @Query("DELETE BancoHoras BH WHERE BH.movimentacao IN (SELECT M FROM Movimentacao M JOIN Usuario U ON M.usuario.id = U.id WHERE U.jornadaTrabalho.id = :jornadaTrabalhoId)")
+    void deleteByJornadaTrabalhoId(@Param("jornadaTrabalhoId") Long jornadaTrabalhoId);
+
+    @Transactional
+    @Modifying
+    @Query("DELETE BancoHoras BH WHERE BH.movimentacao IN (SELECT M FROM Movimentacao M JOIN Usuario U ON M.usuario.id = U.id WHERE U.categoriaUsuario.id = :categoriaUsuarioId)")
+    void deleteByCategoriaUsuarioId(@Param("categoriaUsuarioId") Long categoriaUsuarioId);
+
+    @Transactional
+    @Modifying
+    @Query("DELETE BancoHoras BH WHERE BH.movimentacao IN (SELECT M FROM Movimentacao M JOIN Usuario U ON M.usuario.id = U.id WHERE U.empresa.id = :empresaId)")
+    void deleteByEmpresaId(@Param("empresaId") Long empresaId);
+
+    @Transactional
+    @Modifying
+    @Query("DELETE BancoHoras BH WHERE BH.movimentacao IN (SELECT M FROM Movimentacao M JOIN Usuario U ON M.usuario.id = U.id WHERE U.nivelAcesso.id = :nivelAcessoId)")
+    void deleteByNivelAcessoId(@Param("nivelAcessoId") Long nivelAcessoId);
+
+    @Query(value = "SELECT BH FROM BancoHoras BH WHERE BH.movimentacao.id = :movimentacaoId")
+    List<BancoHoras> findByMovimentacaoId(@Param("movimentacaoId") Long movimentacaoId);
 }

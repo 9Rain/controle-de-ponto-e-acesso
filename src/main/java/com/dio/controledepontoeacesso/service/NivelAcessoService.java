@@ -3,9 +3,7 @@ package com.dio.controledepontoeacesso.service;
 import com.dio.controledepontoeacesso.dto.NivelAcessoDTO;
 import com.dio.controledepontoeacesso.exception.NotFoundException;
 import com.dio.controledepontoeacesso.mapper.NivelAcessoMapper;
-import com.dio.controledepontoeacesso.repository.LocalidadeRepository;
-import com.dio.controledepontoeacesso.repository.NivelAcessoRepository;
-import com.dio.controledepontoeacesso.repository.UsuarioRepository;
+import com.dio.controledepontoeacesso.repository.*;
 import com.dio.controledepontoeacesso.response.NivelAcessoResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,6 +21,12 @@ public class NivelAcessoService {
 
     @Autowired
     UsuarioRepository usuarioRepository;
+
+    @Autowired
+    BancoHorasRepository bancoHorasRepository;
+
+    @Autowired
+    MovimentacaoRepository movimentacaoRepository;
 
     @Autowired
     NivelAcessoMapper nivelAcessoMapper;
@@ -60,6 +64,8 @@ public class NivelAcessoService {
     }
 
     public void deleteNivelAcesso(Long idNivelAcesso) {
+        bancoHorasRepository.deleteByNivelAcessoId(idNivelAcesso);
+        movimentacaoRepository.deleteByNivelAcessoId(idNivelAcesso);
         usuarioRepository.deleteByNivelAcessoId(idNivelAcesso);
         localidadeRepository.deleteByNivelAcessoId(idNivelAcesso);
         nivelAcessoRepository.deleteById(idNivelAcesso);

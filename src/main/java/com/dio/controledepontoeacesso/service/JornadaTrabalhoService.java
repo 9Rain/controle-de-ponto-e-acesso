@@ -3,7 +3,9 @@ package com.dio.controledepontoeacesso.service;
 import com.dio.controledepontoeacesso.dto.JornadaTrabalhoDTO;
 import com.dio.controledepontoeacesso.exception.NotFoundException;
 import com.dio.controledepontoeacesso.mapper.JornadaTrabalhoMapper;
+import com.dio.controledepontoeacesso.repository.BancoHorasRepository;
 import com.dio.controledepontoeacesso.repository.JornadaTrabalhoRepository;
+import com.dio.controledepontoeacesso.repository.MovimentacaoRepository;
 import com.dio.controledepontoeacesso.repository.UsuarioRepository;
 import com.dio.controledepontoeacesso.response.JornadaTrabalhoResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +20,12 @@ public class JornadaTrabalhoService {
 
     @Autowired
     UsuarioRepository usuarioRepository;
+
+    @Autowired
+    BancoHorasRepository bancoHorasRepository;
+
+    @Autowired
+    MovimentacaoRepository movimentacaoRepository;
 
     @Autowired
     JornadaTrabalhoMapper jornadaTrabalhoMapper;
@@ -55,6 +63,8 @@ public class JornadaTrabalhoService {
     }
 
     public void deleteJornada(Long idJornada) {
+        bancoHorasRepository.deleteByJornadaTrabalhoId(idJornada);
+        movimentacaoRepository.deleteByJornadaTrabalhoId(idJornada);
         usuarioRepository.deleteByJornadaTrabalhoId(idJornada);
         jornadaTrabalhoRepository.deleteById(idJornada);
     }

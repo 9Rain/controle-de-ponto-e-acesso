@@ -2,6 +2,7 @@ package com.dio.controledepontoeacesso.dto;
 
 import com.dio.controledepontoeacesso.model.Calendario;
 import com.dio.controledepontoeacesso.model.Ocorrencia;
+import com.dio.controledepontoeacesso.model.Usuario;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 
@@ -39,4 +40,9 @@ public class MovimentacaoDTO {
     @Getter
     @Setter
     private Ocorrencia ocorrencia;
+
+    @NotNull
+    @Getter
+    @Setter
+    private Usuario usuario;
 }

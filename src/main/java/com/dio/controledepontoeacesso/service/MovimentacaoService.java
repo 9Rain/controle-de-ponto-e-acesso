@@ -3,10 +3,7 @@ package com.dio.controledepontoeacesso.service;
 import com.dio.controledepontoeacesso.dto.MovimentacaoDTO;
 import com.dio.controledepontoeacesso.exception.NotFoundException;
 import com.dio.controledepontoeacesso.mapper.MovimentacaoMapper;
-import com.dio.controledepontoeacesso.repository.BancoHorasRepository;
-import com.dio.controledepontoeacesso.repository.CalendarioRepository;
-import com.dio.controledepontoeacesso.repository.MovimentacaoRepository;
-import com.dio.controledepontoeacesso.repository.OcorrenciaRepository;
+import com.dio.controledepontoeacesso.repository.*;
 import com.dio.controledepontoeacesso.response.MovimentacaoResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,6 +25,9 @@ public class MovimentacaoService {
     BancoHorasRepository bancoHorasRepository;
 
     @Autowired
+    UsuarioRepository usuarioRepository;
+
+    @Autowired
     MovimentacaoMapper movimentacaoMapper;
 
     public MovimentacaoDTO saveMovimentacao(MovimentacaoDTO movimentacao) throws NotFoundException {
@@ -39,11 +39,17 @@ public class MovimentacaoService {
                     .map((ocorrencia) -> {
                         movimentacao.setOcorrencia(ocorrencia);
 
-                        return movimentacaoMapper.toMovimentacaoDTO(
-                                movimentacaoRepository.save(
+                        return usuarioRepository.findById(movimentacao.getUsuario().getId())
+                            .map((usuario) -> {
+                                movimentacao.setUsuario(usuario);
+
+                                return movimentacaoMapper.toMovimentacaoDTO(
+                                    movimentacaoRepository.save(
                                         movimentacaoMapper.toMovimentacao(movimentacao)
-                                )
-                        );
+                                    )
+                                );
+                            })
+                            .orElseThrow(() -> new NotFoundException(MovimentacaoResponse.USUARIO_NOT_FOUND));
                     })
                     .orElseThrow(() -> new NotFoundException(MovimentacaoResponse.OCORRENCIA_NOT_FOUND));
             })
@@ -71,11 +77,17 @@ public class MovimentacaoService {
                             .map((ocorrencia) -> {
                                 movimentacao.setOcorrencia(ocorrencia);
 
-                                return movimentacaoMapper.toMovimentacaoDTO(
-                                    movimentacaoRepository.save(
-                                        movimentacaoMapper.toMovimentacao(movimentacao)
-                                    )
-                                );
+                                return usuarioRepository.findById(movimentacao.getUsuario().getId())
+                                    .map((usuario) -> {
+                                        movimentacao.setUsuario(usuario);
+
+                                        return movimentacaoMapper.toMovimentacaoDTO(
+                                            movimentacaoRepository.save(
+                                                movimentacaoMapper.toMovimentacao(movimentacao)
+                                            )
+                                        );
+                                    })
+                                    .orElseThrow(() -> new NotFoundException(MovimentacaoResponse.USUARIO_NOT_FOUND));
                             })
                             .orElseThrow(() -> new NotFoundException(MovimentacaoResponse.OCORRENCIA_NOT_FOUND));
                     })
@@ -97,7 +109,13 @@ public class MovimentacaoService {
 
     public List<MovimentacaoDTO> findByOcorrenciaId(Long occurenceId) throws NotFoundException {
         return ocorrenciaRepository.findById(occurenceId)
-            .map((nivelAcesso) -> movimentacaoMapper.toMovimentacaoDTOs(movimentacaoRepository.findByOcorrenciaId(occurenceId)))
+            .map((ocorrencia) -> movimentacaoMapper.toMovimentacaoDTOs(movimentacaoRepository.findByOcorrenciaId(occurenceId)))
             .orElseThrow(() -> new NotFoundException(MovimentacaoResponse.OCORRENCIA_NOT_FOUND));
+    }
+
+    public List<MovimentacaoDTO> findByUsuarioId(Long userId) throws NotFoundException {
+        return usuarioRepository.findById(userId)
+            .map((usuario) -> movimentacaoMapper.toMovimentacaoDTOs(movimentacaoRepository.findByUsuarioId(userId)))
+            .orElseThrow(() -> new NotFoundException(MovimentacaoResponse.USUARIO_NOT_FOUND));
     }
 }

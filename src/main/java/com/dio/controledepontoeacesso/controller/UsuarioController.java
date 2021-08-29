@@ -1,8 +1,10 @@
 package com.dio.controledepontoeacesso.controller;
 
+import com.dio.controledepontoeacesso.dto.MovimentacaoDTO;
 import com.dio.controledepontoeacesso.dto.UsuarioDTO;
 import com.dio.controledepontoeacesso.exception.NotFoundException;
 import com.dio.controledepontoeacesso.response.UsuarioResponse;
+import com.dio.controledepontoeacesso.service.MovimentacaoService;
 import com.dio.controledepontoeacesso.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -20,6 +22,9 @@ import java.util.Optional;
 public class UsuarioController {
     @Autowired
     UsuarioService usuarioService;
+
+    @Autowired
+    MovimentacaoService movimentacaoService;
 
     @PostMapping
     public ResponseEntity<UsuarioDTO> createUsuario(@Valid @RequestBody UsuarioDTO user){
@@ -128,6 +133,19 @@ public class UsuarioController {
         } catch (EmptyResultDataAccessException e){
             throw new ResponseStatusException(
                     HttpStatus.NOT_FOUND, UsuarioResponse.ENTITY_NOT_FOUND, e);
+        } catch (Exception e){
+            throw new ResponseStatusException(
+                    HttpStatus.INTERNAL_SERVER_ERROR, UsuarioResponse.INTERNAL_SERVER_ERROR, e);
+        }
+    }
+
+    @GetMapping("/{userId}/movements")
+    public ResponseEntity<List<MovimentacaoDTO>> listUsuarioMovimentacoes(@PathVariable("userId") Long userId) {
+        try {
+            return ResponseEntity.ok(movimentacaoService.findByUsuarioId(userId));
+        } catch (NotFoundException e) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, e.getMessage(), e);
         } catch (Exception e){
             throw new ResponseStatusException(
                     HttpStatus.INTERNAL_SERVER_ERROR, UsuarioResponse.INTERNAL_SERVER_ERROR, e);

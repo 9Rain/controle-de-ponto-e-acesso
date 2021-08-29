@@ -5,7 +5,9 @@ import com.dio.controledepontoeacesso.exception.NoSuchElementException;
 import com.dio.controledepontoeacesso.exception.NotFoundException;
 import com.dio.controledepontoeacesso.mapper.CategoriaUsuarioMapper;
 import com.dio.controledepontoeacesso.model.CategoriaUsuario;
+import com.dio.controledepontoeacesso.repository.BancoHorasRepository;
 import com.dio.controledepontoeacesso.repository.CategoriaUsuarioRepository;
+import com.dio.controledepontoeacesso.repository.MovimentacaoRepository;
 import com.dio.controledepontoeacesso.repository.UsuarioRepository;
 import com.dio.controledepontoeacesso.response.CategoriaUsuarioResponse;
 import com.dio.controledepontoeacesso.response.OcorrenciaResponse;
@@ -22,6 +24,12 @@ public class CategoriaUsuarioService {
 
     @Autowired
     UsuarioRepository usuarioRepository;
+
+    @Autowired
+    BancoHorasRepository bancoHorasRepository;
+
+    @Autowired
+    MovimentacaoRepository movimentacaoRepository;
 
     @Autowired
     CategoriaUsuarioMapper categoriaUsuarioMapper;
@@ -59,6 +67,8 @@ public class CategoriaUsuarioService {
     }
 
     public void deleteCategoriaUsuario(Long idCategoriaUsuario) {
+        bancoHorasRepository.deleteByCategoriaUsuarioId(idCategoriaUsuario);
+        movimentacaoRepository.deleteByCategoriaUsuarioId(idCategoriaUsuario);
         usuarioRepository.deleteByCategoriaUsuarioId(idCategoriaUsuario);
         categoriaUsuarioRepository.deleteById(idCategoriaUsuario);
     }
