@@ -1,5 +1,6 @@
 package com.dio.controledepontoeacesso.dto;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 
 import javax.validation.constraints.NotBlank;
@@ -13,6 +14,11 @@ import javax.validation.constraints.Size;
 public class OcorrenciaDTO {
     @Getter
     @Setter
+    @ApiModelProperty(
+            value = "Occurence's id",
+            name = "id",
+            dataType = "Long",
+            readOnly = true)
     private Long id;
 
     @NotNull

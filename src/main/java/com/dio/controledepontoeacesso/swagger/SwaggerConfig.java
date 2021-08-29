@@ -40,7 +40,7 @@ public class SwaggerConfig {
     @Bean
     public ApiInfo apiInfo() {
         return new ApiInfoBuilder()
-                .title("API-REST")
+                .title("Controle de Ponto e Acesso - REST API")
                 .description("Worked hours management and access control API")
                 .version("1.0.0")
                 .license("Apache License Version 2.0")

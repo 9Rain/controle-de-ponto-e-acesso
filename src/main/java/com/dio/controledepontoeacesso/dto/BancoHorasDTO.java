@@ -2,6 +2,7 @@ package com.dio.controledepontoeacesso.dto;
 
 import com.dio.controledepontoeacesso.model.Movimentacao;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 
 import javax.validation.constraints.NotNull;
@@ -15,7 +16,11 @@ import java.time.LocalDateTime;
 @ToString
 
 public class BancoHorasDTO {
-
+    @ApiModelProperty(
+            value = "Additional hour's id",
+            name = "id",
+            dataType = "Long",
+            readOnly = true)
     private Long id;
 
     @NotNull

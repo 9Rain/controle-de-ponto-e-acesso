@@ -1,5 +1,6 @@
 package com.dio.controledepontoeacesso.dto;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,6 +11,11 @@ import javax.validation.constraints.Size;
 public class NivelAcessoDTO {
     @Getter
     @Setter
+    @ApiModelProperty(
+            value = "Access level's id",
+            name = "id",
+            dataType = "Long",
+            readOnly = true)
     private Long id;
 
     @NotNull

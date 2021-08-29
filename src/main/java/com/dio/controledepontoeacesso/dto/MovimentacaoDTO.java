@@ -4,6 +4,7 @@ import com.dio.controledepontoeacesso.model.Calendario;
 import com.dio.controledepontoeacesso.model.Ocorrencia;
 import com.dio.controledepontoeacesso.model.Usuario;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 
 import javax.validation.constraints.NotNull;
@@ -18,6 +19,11 @@ import java.time.LocalDateTime;
 @ToString
 
 public class MovimentacaoDTO {
+    @ApiModelProperty(
+            value = "Movement's id",
+            name = "id",
+            dataType = "Long",
+            readOnly = true)
     private Long id;
 
     @NotNull

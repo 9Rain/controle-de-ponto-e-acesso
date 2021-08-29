@@ -5,6 +5,7 @@ import com.dio.controledepontoeacesso.model.Empresa;
 import com.dio.controledepontoeacesso.model.JornadaTrabalho;
 import com.dio.controledepontoeacesso.model.NivelAcesso;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 
 import javax.validation.constraints.NotBlank;
@@ -19,6 +20,11 @@ import java.time.LocalDateTime;
 public class UsuarioDTO {
     @Getter
     @Setter
+    @ApiModelProperty(
+            value = "User's id",
+            name = "id",
+            dataType = "Long",
+            readOnly = true)
     private Long id;
 
     @NotBlank

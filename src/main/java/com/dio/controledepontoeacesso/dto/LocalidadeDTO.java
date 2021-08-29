@@ -1,6 +1,7 @@
 package com.dio.controledepontoeacesso.dto;
 
 import com.dio.controledepontoeacesso.model.NivelAcesso;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 
 import javax.validation.constraints.NotBlank;
@@ -14,6 +15,11 @@ import javax.validation.constraints.Size;
 public class LocalidadeDTO {
     @Getter
     @Setter
+    @ApiModelProperty(
+            value = "Local's id",
+            name = "id",
+            dataType = "Long",
+            readOnly = true)
     private Long id;
 
     @NotNull

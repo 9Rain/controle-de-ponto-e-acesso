@@ -2,6 +2,7 @@ package com.dio.controledepontoeacesso.dto;
 
 import com.dio.controledepontoeacesso.model.TipoData;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 
 import javax.validation.constraints.NotBlank;
@@ -16,6 +17,11 @@ import java.time.LocalDateTime;
 public class CalendarioDTO {
     @Getter
     @Setter
+    @ApiModelProperty(
+            value = "Calendar's id",
+            name = "id",
+            dataType = "Long",
+            readOnly = true)
     private Long id;
 
     @NotNull

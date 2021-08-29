@@ -1,6 +1,7 @@
 package com.dio.controledepontoeacesso.dto;
 
 import com.dio.controledepontoeacesso.annotation.UF;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 import org.hibernate.validator.constraints.br.CNPJ;
 
@@ -15,6 +16,11 @@ import javax.validation.constraints.Size;
 public class EmpresaDTO {
     @Getter
     @Setter
+    @ApiModelProperty(
+            value = "Company's id",
+            name = "id",
+            dataType = "Long",
+            readOnly = true)
     private Long id;
 
     @NotNull
