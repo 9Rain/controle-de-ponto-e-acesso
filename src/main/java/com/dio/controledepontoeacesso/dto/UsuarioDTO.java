@@ -1,6 +1,7 @@
 package com.dio.controledepontoeacesso.dto;
 
 import com.dio.controledepontoeacesso.model.CategoriaUsuario;
+import com.dio.controledepontoeacesso.model.Empresa;
 import com.dio.controledepontoeacesso.model.JornadaTrabalho;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
@@ -50,8 +51,14 @@ public class UsuarioDTO {
     @NotNull
     private CategoriaUsuario categoriaUsuario;
 
+    @Getter
+    @Setter
+    @NotNull
+    private Empresa empresa;
+
     public UsuarioDTO(Long id, String nome, BigDecimal tolerancia, LocalDateTime inicioJornada,
-                      LocalDateTime finalJornada, JornadaTrabalho jornadaTrabalho, CategoriaUsuario categoriaUsuario) {
+                      LocalDateTime finalJornada, JornadaTrabalho jornadaTrabalho, CategoriaUsuario categoriaUsuario,
+                      Empresa empresa) {
         this.id = id;
         this.setNome(nome);
         this.tolerancia = tolerancia;
@@ -59,6 +66,7 @@ public class UsuarioDTO {
         this.finalJornada = finalJornada;
         this.jornadaTrabalho = jornadaTrabalho;
         this.categoriaUsuario = categoriaUsuario;
+        this.empresa = empresa;
     }
 
     public String getNome() {

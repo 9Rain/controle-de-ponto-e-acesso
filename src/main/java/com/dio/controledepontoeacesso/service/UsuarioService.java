@@ -4,6 +4,7 @@ import com.dio.controledepontoeacesso.dto.UsuarioDTO;
 import com.dio.controledepontoeacesso.exception.NotFoundException;
 import com.dio.controledepontoeacesso.mapper.UsuarioMapper;
 import com.dio.controledepontoeacesso.repository.CategoriaUsuarioRepository;
+import com.dio.controledepontoeacesso.repository.EmpresaRepository;
 import com.dio.controledepontoeacesso.repository.JornadaTrabalhoRepository;
 import com.dio.controledepontoeacesso.repository.UsuarioRepository;
 import com.dio.controledepontoeacesso.response.UsuarioResponse;
@@ -24,6 +25,9 @@ public class UsuarioService {
     CategoriaUsuarioRepository categoriaUsuarioRepository;
 
     @Autowired
+    EmpresaRepository empresaRepository;
+
+    @Autowired
     UsuarioMapper usuarioMapper;
 
     public UsuarioDTO saveUsuario(UsuarioDTO usuario) throws NotFoundException {
@@ -35,11 +39,17 @@ public class UsuarioService {
                     .map((categoriaUsuario) -> {
                         usuario.setCategoriaUsuario(categoriaUsuario);
 
-                        return usuarioMapper.toUsuarioDTO(
-                                usuarioRepository.save(
+                        return empresaRepository.findById(usuario.getEmpresa().getId())
+                            .map((empresa) -> {
+                                usuario.setEmpresa(empresa);
+
+                                return usuarioMapper.toUsuarioDTO(
+                                    usuarioRepository.save(
                                         usuarioMapper.toUsuario(usuario)
-                                )
-                        );
+                                    )
+                                );
+                            })
+                            .orElseThrow(() -> new NotFoundException(UsuarioResponse.EMPRESA_NOT_FOUND));
                     })
                     .orElseThrow(() -> new NotFoundException(UsuarioResponse.CATEGORIA_USUARIO_NOT_FOUND));
             })
@@ -67,11 +77,17 @@ public class UsuarioService {
                             .map((categoriaUsuario) -> {
                                 usuario.setCategoriaUsuario(categoriaUsuario);
 
-                                return usuarioMapper.toUsuarioDTO(
-                                    usuarioRepository.save(
-                                        usuarioMapper.toUsuario(usuario)
-                                    )
-                                );
+                                return empresaRepository.findById(usuario.getEmpresa().getId())
+                                    .map((empresa) -> {
+                                        usuario.setEmpresa(empresa);
+
+                                        return usuarioMapper.toUsuarioDTO(
+                                            usuarioRepository.save(
+                                                usuarioMapper.toUsuario(usuario)
+                                            )
+                                        );
+                                    })
+                                    .orElseThrow(() -> new NotFoundException(UsuarioResponse.EMPRESA_NOT_FOUND));
                             })
                             .orElseThrow(() -> new NotFoundException(UsuarioResponse.CATEGORIA_USUARIO_NOT_FOUND));
                     })
@@ -94,5 +110,11 @@ public class UsuarioService {
         return categoriaUsuarioRepository.findById(userCategoryId)
             .map((categoriaUsuario) -> usuarioMapper.toUsuarioDTOs(usuarioRepository.findByCategoriaUsuarioId(userCategoryId)))
             .orElseThrow(() -> new NotFoundException(UsuarioResponse.CATEGORIA_USUARIO_NOT_FOUND));
+    }
+
+    public List<UsuarioDTO> findByEmpresaId(Long companyId) throws NotFoundException {
+        return empresaRepository.findById(companyId)
+                .map((empresa) -> usuarioMapper.toUsuarioDTOs(usuarioRepository.findByEmpresaId(companyId)))
+                .orElseThrow(() -> new NotFoundException(UsuarioResponse.EMPRESA_NOT_FOUND));
     }
 }

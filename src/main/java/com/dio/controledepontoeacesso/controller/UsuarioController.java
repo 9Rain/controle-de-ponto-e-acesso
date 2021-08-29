@@ -35,6 +35,12 @@ public class UsuarioController {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST, UsuarioResponse.CATEGORIA_USUARIO_IS_REQUIRED, new NullPointerException());
 
+        var empresaId = Optional.ofNullable(user.getEmpresa().getId());
+
+        if(empresaId.isEmpty())
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, UsuarioResponse.EMPRESA_IS_REQUIRED, new NullPointerException());
+
         try {
             return ResponseEntity.status(HttpStatus.CREATED).body(usuarioService.saveUsuario(user));
         } catch (NotFoundException e) {
@@ -83,6 +89,12 @@ public class UsuarioController {
         if(categoriaUsuarioId.isEmpty())
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST, UsuarioResponse.CATEGORIA_USUARIO_IS_REQUIRED, new NullPointerException());
+
+        var empresaId = Optional.ofNullable(user.getEmpresa().getId());
+
+        if(empresaId.isEmpty())
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, UsuarioResponse.EMPRESA_IS_REQUIRED, new NullPointerException());
 
         try {
             user.setId(userId);

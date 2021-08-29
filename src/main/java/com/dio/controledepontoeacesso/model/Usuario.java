@@ -33,4 +33,7 @@ public class Usuario {
 
     @ManyToOne(optional = false)
     private CategoriaUsuario categoriaUsuario;
+
+    @ManyToOne(optional = false)
+    private Empresa empresa;
 }

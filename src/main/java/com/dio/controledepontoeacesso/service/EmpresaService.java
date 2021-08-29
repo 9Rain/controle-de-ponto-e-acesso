@@ -4,6 +4,7 @@ import com.dio.controledepontoeacesso.dto.EmpresaDTO;
 import com.dio.controledepontoeacesso.exception.NotFoundException;
 import com.dio.controledepontoeacesso.mapper.EmpresaMapper;
 import com.dio.controledepontoeacesso.repository.EmpresaRepository;
+import com.dio.controledepontoeacesso.repository.UsuarioRepository;
 import com.dio.controledepontoeacesso.response.EmpresaResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,9 @@ import java.util.List;
 public class EmpresaService {
     @Autowired
     EmpresaRepository empresaRepository;
+
+    @Autowired
+    UsuarioRepository usuarioRepository;
 
     @Autowired
     EmpresaMapper empresaMapper;
@@ -51,6 +55,7 @@ public class EmpresaService {
     }
 
     public void deleteEmpresa(Long idEmpresa) {
+        usuarioRepository.deleteByEmpresaId(idEmpresa);
         empresaRepository.deleteById(idEmpresa);
     }
 }
